@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/plugins/Paprika" >
+        <file>icon.png</file>
+		<file>resources/emmah.gif</file>
+		<file>resources/logo_SIG.jpg</file>
+		<file>resources/logo_SMBS.jpg</file>
+		<file>resources/logoSNOKarst.PNG</file>
+		<file>resources/Logo_BRGM.svg</file>
+    </qresource>
+</RCC>

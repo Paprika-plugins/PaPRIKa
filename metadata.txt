@@ -1,0 +1,43 @@
+# This file contains metadata for your plugin. Since 
+# version 2.0 of QGIS this is the proper way to supply 
+# information about a plugin. The old method of 
+# embedding metadata in __init__.py will 
+# is no longer supported since version 2.0.
+
+# This file should be included when you package your plugin.# Mandatory items:
+
+[general]
+name=PaPRIKa
+qgisMinimumVersion=2.14
+description= Tools to apply the karstic hydrosystem vulnerability mapping method PaPRIKa () with QGIS. 
+	PaPRIKa method has been developped by N. Dorfliger (BRGM RP- 57527-FR).
+version=0.4
+author=Yoann Lecomte
+email=ylecomte@sig.eu.com
+
+about=This application has been supported by the UAPV, SNO Karst, SMBS, UMR EMMAH. It has been created after a 6 months work on the "Fontaine de Vaucluse" spring. 
+	The goal of this extension is to provide easy to use tools for every scientist who needs to evaluate the vulnerability of a water resource in a karstic context.
+	PaPRIKa is the most used methodology to complete such studies.
+
+tracker=sig.eu.com
+repository=sig.eu.com
+# End of mandatory metadata
+
+# Recommended items:
+
+# Uncomment the following line and add your changelog:
+# changelog=
+	1.0 : first version of plugin.
+
+# Tags are comma separated with spaces allowed
+tags= PaPRIKa, vector, raster, vulnerability, karst, BRGM, hydrogeology
+
+homepage=
+category=Plugins
+icon=icon.png
+# experimental flag
+experimental=False
+
+# deprecated flag (applies to the whole plugin, not just a single version)
+deprecated=False
+
