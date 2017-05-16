@@ -266,61 +266,45 @@ class Paprika:
 			self.dockwidget.mMapLayerComboBox_KARST_FEATURES.setFilters(QgsMapLayerProxyModel.VectorLayer)
 			self.dockwidget.mMapLayerComboBox_ZNS.setFilters(QgsMapLayerProxyModel.RasterLayer)
 			self.dockwidget.mMapLayerComboBox_PENTE.setFilters(QgsMapLayerProxyModel.RasterLayer)
-			list_P = []
-			for layer in QgsMapLayerRegistry.instance().mapLayers().values():
-				if layer.name() != 'Carte_P':
-					list_P.append(layer)
-			self.dockwidget.mMapLayerComboBox_CartePF.setExceptedLayerList(list_P)
-			list_R = []
-			for layer in QgsMapLayerRegistry.instance().mapLayers().values():
-				if layer.name() != 'Carte_R':
-					list_R.append(layer)
-			self.dockwidget.mMapLayerComboBox_CarteRF.setExceptedLayerList(list_R)
-			list_I = []
-			for layer in QgsMapLayerRegistry.instance().mapLayers().values():
-				if layer.name() != 'Carte_I':
-					list_I.append(layer)
-			self.dockwidget.mMapLayerComboBox_CarteIF.setExceptedLayerList(list_I)
-			list_Ka = []
-			for layer in QgsMapLayerRegistry.instance().mapLayers().values():
-				if layer.name() != 'Carte_Ka':
-					list_Ka.append(layer)
-			self.dockwidget.mMapLayerComboBox_CarteKaF.setExceptedLayerList(list_Ka)
+			self.dockwidget.mMapLayerComboBox_CartePF.setFilters(QgsMapLayerProxyModel.RasterLayer)
+			self.dockwidget.mMapLayerComboBox_CarteRF.setFilters(QgsMapLayerProxyModel.RasterLayer)
+			self.dockwidget.mMapLayerComboBox_CarteIF.setFilters(QgsMapLayerProxyModel.RasterLayer)
+			self.dockwidget.mMapLayerComboBox_CarteKaF.setFilters(QgsMapLayerProxyModel.RasterLayer)
 			
 			# peuplement de la comboBox du critere de Mangin
 			self.dockwidget.comboBox_MANGIN.addItems(['1','2','3','4','5'])
 		
 			# peuplement des ComboBox des champs et gestion des critères optionnels
 				#SOL
-			self.dockwidget.mFieldComboBox_SOL.setFilters(QgsFieldProxyModel.Int)
+			self.dockwidget.mFieldComboBox_SOL.setFilters(QgsFieldProxyModel.Numeric)
 			self.dockwidget.mFieldComboBox_SOL.setLayer(self.dockwidget.mMapLayerComboBox_SOL.currentLayer())
 			self.dockwidget.mMapLayerComboBox_SOL.layerChanged.connect(self.dockwidget.mFieldComboBox_SOL.setLayer)
 				#EPIKARST
-			self.dockwidget.mFieldComboBox_EPIKARST.setFilters(QgsFieldProxyModel.Int)
+			self.dockwidget.mFieldComboBox_EPIKARST.setFilters(QgsFieldProxyModel.Numeric)
 			self.dockwidget.mFieldComboBox_EPIKARST.setLayer(self.dockwidget.mMapLayerComboBox_EPIKARST.currentLayer())
 			self.dockwidget.mMapLayerComboBox_EPIKARST.layerChanged.connect(self.dockwidget.mFieldComboBox_EPIKARST.setLayer)
 			self.dockwidget.checkBox_Epikarst.stateChanged.connect(self.desactive_widget_Epikarst)
 				#SINKING STREAM CATCHMENT
-			self.dockwidget.mFieldComboBox_SINKING_CATCHMENT.setFilters(QgsFieldProxyModel.Int)
+			self.dockwidget.mFieldComboBox_SINKING_CATCHMENT.setFilters(QgsFieldProxyModel.Numeric)
 			self.dockwidget.mFieldComboBox_SINKING_CATCHMENT.setLayer(self.dockwidget.mMapLayerComboBox_SINKING_CATCHMENT.currentLayer())
 			self.dockwidget.mMapLayerComboBox_SINKING_CATCHMENT.layerChanged.connect(self.dockwidget.mFieldComboBox_SINKING_CATCHMENT.setLayer)
 			self.dockwidget.checkBox_Sinking.stateChanged.connect(self.desactive_widget_Sinking)
 				#LITHOLOGY
-			self.dockwidget.mFieldComboBox_ROCHE.setFilters(QgsFieldProxyModel.Int)
+			self.dockwidget.mFieldComboBox_ROCHE.setFilters(QgsFieldProxyModel.Numeric)
 			self.dockwidget.mFieldComboBox_ROCHE.setLayer(self.dockwidget.mMapLayerComboBox_ROCHE.currentLayer())
 			self.dockwidget.mMapLayerComboBox_ROCHE.layerChanged.connect(self.dockwidget.mFieldComboBox_ROCHE.setLayer)
 				#STRUCTURE
-			self.dockwidget.mFieldComboBox_STRUCTURE.setFilters(QgsFieldProxyModel.Int)
+			self.dockwidget.mFieldComboBox_STRUCTURE.setFilters(QgsFieldProxyModel.Numeric)
 			self.dockwidget.mFieldComboBox_STRUCTURE.setLayer(self.dockwidget.mMapLayerComboBox_STRUCTURE.currentLayer())
 			self.dockwidget.mMapLayerComboBox_STRUCTURE.layerChanged.connect(self.dockwidget.mFieldComboBox_STRUCTURE.setLayer)
 			self.dockwidget.checkBox_STRUCTURE.stateChanged.connect(self.desactive_widget_structure)
 				#KARST FEATURES I
-			self.dockwidget.mFieldComboBox_OBJETS_EXOKARSTIQUES.setFilters(QgsFieldProxyModel.Int)
+			self.dockwidget.mFieldComboBox_OBJETS_EXOKARSTIQUES.setFilters(QgsFieldProxyModel.Numeric)
 			self.dockwidget.mFieldComboBox_OBJETS_EXOKARSTIQUES.setLayer(self.dockwidget.mMapLayerComboBox_OBJETS_EXOKARSTIQUES.currentLayer())
 			self.dockwidget.mMapLayerComboBox_OBJETS_EXOKARSTIQUES.layerChanged.connect(self.dockwidget.mFieldComboBox_OBJETS_EXOKARSTIQUES.setLayer)
 			self.dockwidget.checkBox_OBJETS_EXOKARSTIQUES.stateChanged.connect(self.desactive_widget_objets_exokarstiques)
 				#KARST FEATURES Ka
-			self.dockwidget.mFieldComboBox_KARST_FEATURES.setFilters(QgsFieldProxyModel.Int)
+			self.dockwidget.mFieldComboBox_KARST_FEATURES.setFilters(QgsFieldProxyModel.Numeric)
 			self.dockwidget.mFieldComboBox_KARST_FEATURES.setLayer(self.dockwidget.mMapLayerComboBox_KARST_FEATURES.currentLayer())
 			self.dockwidget.mMapLayerComboBox_KARST_FEATURES.layerChanged.connect(self.dockwidget.mFieldComboBox_KARST_FEATURES.setLayer)
 			self.dockwidget.checkBox_KARST_FEATURES.stateChanged.connect(self.desactive_widget_karst_features)
