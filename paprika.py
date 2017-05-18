@@ -704,7 +704,8 @@ class Paprika:
 	
 	def download_methodo(self):
 		"""fonction d'ouverture de la methodologie officielle PaPRIKa"""
-		webbrowser.open('http://infoterre.brgm.fr/rapports/RP-57527-FR.pdf')
+		webbrowser.open_new('http://infoterre.brgm.fr/rapports/RP-57527-FR.pdf')
+		webbrowser.open_new_tab('http://link.springer.com/article/10.1007/s10040-010-0688-8')
 	
 	def open_help(self):
 		"""fonction d'ouverture de la documentation du plugin"""
