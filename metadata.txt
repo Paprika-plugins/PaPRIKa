@@ -11,7 +11,7 @@ name=PaPRIKa
 qgisMinimumVersion=2.14
 description= Tools to apply the karstic hydrosystem vulnerability mapping method PaPRIKa () with QGIS. 
 	PaPRIKa method has been developped by N. Dorfliger (BRGM RP- 57527-FR).
-version=0.4
+version=1.0
 author=Yoann Lecomte
 email=ylecomte@sig.eu.com
 
@@ -20,17 +20,17 @@ about=This application has been supported by the UAPV, SNO Karst, SMBS, UMR EMMA
 	PaPRIKa is the most used methodology to complete such studies.
 
 tracker=sig.eu.com
-repository=sig.eu.com
+repository=ftp://plugins@ftp.onstatic-fr.setupdns.net/public/plugins/SIG/qgis/serveur_plugins/plugins/
 # End of mandatory metadata
 
 # Recommended items:
 
 # Uncomment the following line and add your changelog:
-# changelog=
-	1.0 : first version of plugin.
+changelog=
+	1.0 : first version of plugin on repository.
 
 # Tags are comma separated with spaces allowed
-tags= PaPRIKa, vector, raster, vulnerability, karst, BRGM, hydrogeology
+tags= PaPRIKa, vector, raster, vulnerability, karst, hydrogeology
 
 homepage=
 category=Plugins
