@@ -656,13 +656,13 @@ class Paprika:
 		pI=self.dockwidget.spinBox_PondI.value()
 		pKa=self.dockwidget.spinBox_PondKa.value()
 		if pI + pKa < 50 :
-			return self.showdialog('I weight + Ka weight must be superior at 50%!', 'invalid weight...')
+			self.iface.messageBar().pushMessage('Anormal weight','I weight + Ka weight must be superior at 50%!', level=QgsMessageBar.WARNING, duration = 5)
 		if pI + pKa > 65 :
-			return self.showdialog('I weight + Ka weight must be inferior at 65%!', 'invalid weight...') 
+			self.iface.messageBar().pushMessage('Anormal weight','I weight + Ka weight must be inferior at 65%!', level=QgsMessageBar.WARNING, duration = 5)
 		if pP + pR < 35:
-			return self.showdialog('P weight + R weight must be superior at 35%!', 'invalid weight...') 
+			self.iface.messageBar().pushMessage('Anormal weight','P weight + R weight must be superior at 35%!', level=QgsMessageBar.WARNING, duration = 5)
 		if pP + pR > 50:
-			return self.showdialog('P weight + R weight must be inferior at 50%!', 'invalid weight...') 
+			self.iface.messageBar().pushMessage('Anormal weight','P weight + R weight must be inferior at 50%!', level=QgsMessageBar.WARNING, duration = 5)
 		if pI + pKa + pP + pR != 100:
 			return self.showdialog('weight sum must be egal at 100%!', 'invalid weight...')
 			
