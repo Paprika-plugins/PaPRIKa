@@ -5,7 +5,10 @@ import numpy
 from shutil import copyfile
 import os
 
-def genere_carteI(doss, extension, pente, reclass_rules_pente,exokarst,field_exokarst):
+def genere_carteI(doss, extension, dem, reclass_rules_pente,exokarst,field_exokarst):
+	#creation du raster Pente
+	processing.runalg("gdalogr:slope",dem,1,False,False,True,1,str(doss)+'/rPente.tif')
+	rPente = QgsRasterLayer(str(doss)+'/rPente.tif', "rPente")
 	#creation du raster Exokarst
 	copyfile(str(doss)+'/Extension.tif',str(doss)+'/rExokarst.tif')
 	processing.runalg("gdalogr:rasterize_over", exokarst, field_exokarst, str(doss)+'/rExokarst.tif')
@@ -23,7 +26,7 @@ def genere_carteI(doss, extension, pente, reclass_rules_pente,exokarst,field_exo
 	print(StrExtent)
 
 	#reclassement de la pente
-	processing.runalg("grass7:r.reclass", pente, reclass_rules_pente, StrExtent, ExtentInfo[1], str(doss)+'/Slope.tif')
+	processing.runalg("grass7:r.reclass", rPente, reclass_rules_pente, StrExtent, ExtentInfo[1], str(doss)+'/Slope.tif')
 	src_ds_slope = gdal.Open(str(doss)+'/Slope.tif')
 	driver_slope = gdal.GetDriverByName("GTiff") 
 	dst_ds_slope = driver_slope.CreateCopy(str(doss)+'/rSlope.tif', src_ds_slope, 0 )
