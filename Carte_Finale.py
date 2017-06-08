@@ -93,12 +93,12 @@ def genere_carteFinale(pP,pR,pI,pKa,Carte_P, Carte_R, Carte_I, Carte_Ka, doss):
 	StrExtent = ','.join(Extent)
 
 	#reclassement de la Carte Vg et affichage de la carte
-	processing.runalg("grass7:r.reclass", str(doss)+'/Carte_Vg.tif', os.path.dirname(os.path.abspath(__file__))+ '/reclass_rules/reclass_rules_carteVg.txt', StrExtent, int(ExtentInfo[1]), str(doss)+'/rCarte_finale.tif')
-	src_ds_Carte_Finale = gdal.Open(str(doss)+'/rCarte_Finale.tif')
+	processing.runalg("grass7:r.reclass", str(doss)+'/Carte_Vg.tif', os.path.dirname(os.path.abspath(__file__))+ '/reclass_rules/reclass_rules_carteVg.txt', StrExtent, int(ExtentInfo[1]), str(doss)+'/rVulnerability_Map.tif')
+	src_ds_Carte_Finale = gdal.Open(str(doss)+'/rVulnerability_Map.tif')
 	driver_Carte_Finale = gdal.GetDriverByName("GTiff") 
-	dst_ds_Carte_Finale = driver_Carte_Finale.CreateCopy(str(doss)+'/Carte_Finale.tif', src_ds_Carte_Finale, 0 )
+	dst_ds_Carte_Finale = driver_Carte_Finale.CreateCopy(str(doss)+'/Vulnerability_Map.tif', src_ds_Carte_Finale, 0 )
 	src_ds_Carte_Finale = None
 	dst_ds_Carte_Finale = None
-	os.remove(str(doss)+'/rCarte_Finale.tif')
-	os.remove(str(doss)+'/rCarte_Finale.tfw')
-	rCarte_Finale = QgsRasterLayer(str(doss)+'/Carte_Finale.tif', "Carte_Finale")
+	os.remove(str(doss)+'/rVulnerability_Map.tif')
+	os.remove(str(doss)+'/rVulnerability_Map.tfw')
+	#rCarte_Finale = QgsRasterLayer(str(doss)+'/Vulnerability_Map.tif', "Vulnerability Map")

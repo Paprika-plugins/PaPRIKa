@@ -135,7 +135,7 @@ def genere_carteP(extension, doss, ZNS,Sol, field_sol, Epikarst, field_epikarst,
 	Syst_coord = source.GetProjection()
 
 	#ecriture du raster a partir de l'array
-	Raster = gdal.GetDriverByName('Gtiff').Create(str(doss)+'/Carte_P.tif', extension1.RasterXSize, extension1.RasterYSize, 1, gdal.GDT_Byte)
+	Raster = gdal.GetDriverByName('Gtiff').Create(str(doss)+'/P_factor.tif', extension1.RasterXSize, extension1.RasterYSize, 1, gdal.GDT_Byte)
 	proj = osr.SpatialReference()
 	proj.ImportFromWkt(Syst_coord)
 	Raster.SetProjection(proj.ExportToWkt())

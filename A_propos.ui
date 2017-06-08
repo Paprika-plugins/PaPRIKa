@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>462</width>
-    <height>519</height>
+    <height>398</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -255,7 +255,7 @@
          <item>
           <widget class="QLabel" name="label_17">
            <property name="text">
-            <string>&lt;a href=&quot;mailto:chloe.ollivier@alumni.univavignon.fr?subject=Plugin Paprika&quot; style=&quot;color:#2E2EFE;text-decoration:none;&quot;&gt;&lt;U&gt;Chloe Ollivier&lt;/U&gt;&lt;/a&gt;</string>
+            <string>&lt;a href=&quot;mailto:chloe.ollivier@alumni.univ-avignon.fr?subject=Plugin Paprika&quot; style=&quot;color:#2E2EFE;text-decoration:none;&quot;&gt;&lt;U&gt;Chloe Ollivier&lt;/U&gt;&lt;/a&gt;</string>
            </property>
            <property name="openExternalLinks">
             <bool>true</bool>
@@ -306,7 +306,7 @@
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <item>
            <layout class="QGridLayout" name="gridLayout_3">
-            <item row="3" column="0">
+            <item row="2" column="0">
              <widget class="QLabel" name="label_4">
               <property name="font">
                <font>
@@ -329,25 +329,6 @@
               </property>
              </widget>
             </item>
-            <item row="2" column="0">
-             <widget class="QLabel" name="label_3">
-              <property name="maximumSize">
-               <size>
-                <width>120</width>
-                <height>90</height>
-               </size>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="pixmap">
-               <pixmap resource="resources.qrc">:/plugins/Paprika/resources/logo_SIG.jpg</pixmap>
-              </property>
-              <property name="scaledContents">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
            </layout>
           </item>
          </layout>
@@ -357,53 +338,10 @@
      </item>
     </layout>
    </item>
-   <item>
-    <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-     </property>
-    </widget>
-   </item>
   </layout>
  </widget>
  <resources>
   <include location="resources.qrc"/>
  </resources>
- <connections>
-  <connection>
-   <sender>buttonBox</sender>
-   <signal>accepted()</signal>
-   <receiver>A_propos</receiver>
-   <slot>accept()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>248</x>
-     <y>254</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>157</x>
-     <y>274</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>buttonBox</sender>
-   <signal>rejected()</signal>
-   <receiver>A_propos</receiver>
-   <slot>reject()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>316</x>
-     <y>260</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>286</x>
-     <y>274</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

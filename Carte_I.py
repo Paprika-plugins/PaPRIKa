@@ -62,7 +62,7 @@ def genere_carteI(doss, extension, dem, reclass_rules_pente,exokarst,field_exoka
 	Syst_coord = source.GetProjection()
 
 	#ecriture du raster a partir de l'array
-	Raster = gdal.GetDriverByName('Gtiff').Create(str(doss)+'/Carte_I.tif', extension1.RasterXSize, extension1.RasterYSize, 1, gdal.GDT_Byte)
+	Raster = gdal.GetDriverByName('Gtiff').Create(str(doss)+'/I_factor.tif', extension1.RasterXSize, extension1.RasterYSize, 1, gdal.GDT_Byte)
 	proj = osr.SpatialReference()
 	proj.ImportFromWkt(Syst_coord)
 	Raster.SetProjection(proj.ExportToWkt())

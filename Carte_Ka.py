@@ -57,7 +57,7 @@ def genere_carteKa(Mangin, karst_features, field_karst_features, extension, doss
 				valCarteKa[j,i] = index
 	
 	#ecriture du raster a partir de l'array
-	Raster = gdal.GetDriverByName('Gtiff').Create(str(doss)+'/Carte_Ka.tif', extension1.RasterXSize, extension1.RasterYSize, 1, gdal.GDT_Byte)
+	Raster = gdal.GetDriverByName('Gtiff').Create(str(doss)+'/Ka_factor.tif', extension1.RasterXSize, extension1.RasterYSize, 1, gdal.GDT_Byte)
 	proj = osr.SpatialReference()
 	proj.ImportFromWkt(Syst_coord)
 	Raster.SetProjection(proj.ExportToWkt())

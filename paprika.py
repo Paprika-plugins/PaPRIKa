@@ -379,6 +379,11 @@ class Paprika:
 	
 	def lancer_genere_guide(self):
 		"""lance la fonction de generation du guide""" 
+		if os.path.exists(self.dockwidget.lineEdit_dossier_travail.text())== False :
+			return self.showdialog('Please check if the directory of generating is filled', 'Directory missing in the system...')
+		for lyr in QgsMapLayerRegistry.instance().mapLayers().values():
+			if lyr.name() == "Extension": 
+				QgsMapLayerRegistry.instance().removeMapLayers( [lyr.id()] )
 		raster_extension.genere_guide(self.dockwidget.mMapLayerComboBox_IMPLUVIUM.currentLayer(), self.dockwidget.spinBox_Resolution.value(),self.dockwidget.lineEdit_dossier_travail.text() )
 		self.iface.addRasterLayer(str(self.dockwidget.lineEdit_dossier_travail.text())+'/Extension.tif','Extension')		
 	
@@ -436,6 +441,10 @@ class Paprika:
 			field_sinking = None 
 		
 		#lance la generation de la carte P
+		for lyr in QgsMapLayerRegistry.instance().mapLayers().values():
+			if lyr.name() == "P factor": 
+				QgsMapLayerRegistry.instance().removeMapLayers( [lyr.id()] )
+				
 		Carte_P.genere_carteP(
 			layer,
 			self.dockwidget.lineEdit_dossier_travail.text(),
@@ -448,7 +457,7 @@ class Paprika:
 			field_sinking)
 			
 		#genere le style et charge le tif dans QGIS avec un message
-		lay_carteP = QgsRasterLayer(str(self.dockwidget.lineEdit_dossier_travail.text())+'/Carte_P.tif','P factor')
+		lay_carteP = QgsRasterLayer(str(self.dockwidget.lineEdit_dossier_travail.text())+'/P_factor.tif','P factor')
 		s = QgsRasterShader()
 		c = QgsColorRampShader()
 		c.setColorRampType(QgsColorRampShader.EXACT)
@@ -509,6 +518,10 @@ class Paprika:
 			else :
 				pass
 		#lance la generation la carte R
+		for lyr in QgsMapLayerRegistry.instance().mapLayers().values():
+			if lyr.name() == "R factor": 
+				QgsMapLayerRegistry.instance().removeMapLayers( [lyr.id()] )
+				
 		Carte_R.genere_carteR(
 			self.dockwidget.lineEdit_dossier_travail.text(),
 			layer,
@@ -518,7 +531,7 @@ class Paprika:
 			field_structure)
 		
 		#genere le style et charge le tif dans QGIS
-		lay_carteR = QgsRasterLayer(str(self.dockwidget.lineEdit_dossier_travail.text())+'/Carte_R.tif','R factor')
+		lay_carteR = QgsRasterLayer(str(self.dockwidget.lineEdit_dossier_travail.text())+'/R_factor.tif','R factor')
 		s = QgsRasterShader()
 		c = QgsColorRampShader()
 		c.setColorRampType(QgsColorRampShader.EXACT)
@@ -569,6 +582,10 @@ class Paprika:
 			field_exokarst = None
 		
 		#lance la generation de la carte I
+		for lyr in QgsMapLayerRegistry.instance().mapLayers().values():
+			if lyr.name() == "I Factor": 
+				QgsMapLayerRegistry.instance().removeMapLayers( [lyr.id()] )
+				
 		Carte_I.genere_carteI(
 			self.dockwidget.lineEdit_dossier_travail.text(),
 			layer,
@@ -578,7 +595,7 @@ class Paprika:
 			field_exokarst)
 			
 		#genere le style et charge le tif dans QGIS
-		lay_carteI = QgsRasterLayer(str(self.dockwidget.lineEdit_dossier_travail.text())+'/Carte_I.tif','I factor')
+		lay_carteI = QgsRasterLayer(str(self.dockwidget.lineEdit_dossier_travail.text())+'/I_factor.tif','I factor')
 		s = QgsRasterShader()
 		c = QgsColorRampShader()
 		c.setColorRampType(QgsColorRampShader.EXACT)
@@ -624,6 +641,9 @@ class Paprika:
 			field_karst_features = None
 		
 		#genere le tif
+		for lyr in QgsMapLayerRegistry.instance().mapLayers().values():
+			if lyr.name() == "Ka factor": 
+				QgsMapLayerRegistry.instance().removeMapLayers( [lyr.id()] )
 		Carte_Ka.genere_carteKa(
 			int(self.dockwidget.comboBox_MANGIN.currentText()),
 			karst_features,
@@ -631,7 +651,7 @@ class Paprika:
 			layer, 
 			self.dockwidget.lineEdit_dossier_travail.text())
 		#genere le style et charge le tif dans QGIS
-		lay_carteKa = QgsRasterLayer(str(self.dockwidget.lineEdit_dossier_travail.text())+'/Carte_Ka.tif','Ka factor')
+		lay_carteKa = QgsRasterLayer(str(self.dockwidget.lineEdit_dossier_travail.text())+'/Ka_factor.tif','Ka factor')
 		s = QgsRasterShader()
 		c = QgsColorRampShader()
 		c.setColorRampType(QgsColorRampShader.EXACT)
@@ -650,6 +670,8 @@ class Paprika:
 	
 	def lancer_carteFinale(self):
 		"""fonction de generation, mise en forme et chargement de la carte finale"""
+		if os.path.exists(self.dockwidget.lineEdit_dossier_travail.text())== False :
+			return self.showdialog('Please check if the directory of generating is filled', 'Directory missing in the system...')
 		#verifie la ponderation
 		pP=self.dockwidget.spinBox_PondP.value()
 		pR=self.dockwidget.spinBox_PondR.value()
@@ -666,10 +688,14 @@ class Paprika:
 		if pI + pKa + pP + pR != 100:
 			return self.showdialog('weight sum must be egal at 100%!', 'invalid weight...')
 			
-		#genere le tif
+		#supprime la couche si elle est deja chargee et genere le tif
+		for lyr in QgsMapLayerRegistry.instance().mapLayers().values():
+			if lyr.name() == "Vulnerability Map": 
+				QgsMapLayerRegistry.instance().removeMapLayers( [lyr.id()] )
+				
 		Carte_Finale.genere_carteFinale(self.dockwidget.spinBox_PondP.value(),self.dockwidget.spinBox_PondR.value(),self.dockwidget.spinBox_PondI.value(),self.dockwidget.spinBox_PondKa.value(),self.dockwidget.mMapLayerComboBox_CartePF.currentLayer(),self.dockwidget.mMapLayerComboBox_CarteRF.currentLayer(),self.dockwidget.mMapLayerComboBox_CarteIF.currentLayer(),self.dockwidget.mMapLayerComboBox_CarteKaF.currentLayer(),self.dockwidget.lineEdit_dossier_travail.text())
 		#genere le style et charge le tif dans QGIS
-		lay_carteFinale = QgsRasterLayer(str(self.dockwidget.lineEdit_dossier_travail.text())+'/Carte_Finale.tif','Carte_Finale')
+		lay_carteFinale = QgsRasterLayer(str(self.dockwidget.lineEdit_dossier_travail.text())+'/Vulnerability_Map.tif','Vulnerability Map')
 		s = QgsRasterShader()
 		c = QgsColorRampShader()
 		c.setColorRampType(QgsColorRampShader.EXACT)
@@ -684,7 +710,7 @@ class Paprika:
 		ps = QgsSingleBandPseudoColorRenderer(lay_carteFinale.dataProvider(), 1, s)
 		lay_carteFinale.setRenderer(ps)
 		QgsMapLayerRegistry.instance().addMapLayer(lay_carteFinale)
-		self.showdialog('Final map created wih success!', 'Well done!')
+		return self.showdialog('Final map created wih success!', 'Well done!')
 	
 	def showdialog (self, text, title):
 		"""fonction permettant d'afficher des messages a l'utilisateur"""

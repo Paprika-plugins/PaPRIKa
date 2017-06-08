@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'A_Propos.ui'
+# Form implementation generated from reading ui file 'A_propos.ui'
 #
-# Created: Fri May 19 16:03:20 2017
+# Created: Thu Jun 08 12:01:48 2017
 #      by: PyQt4 UI code generator 4.10.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -26,7 +26,7 @@ except AttributeError:
 class Ui_A_propos(object):
     def setupUi(self, A_propos):
         A_propos.setObjectName(_fromUtf8("A_propos"))
-        A_propos.resize(462, 519)
+        A_propos.resize(462, 398)
         self.verticalLayout_2 = QtGui.QVBoxLayout(A_propos)
         self.verticalLayout_2.setObjectName(_fromUtf8("verticalLayout_2"))
         self.verticalLayout = QtGui.QVBoxLayout()
@@ -175,27 +175,13 @@ class Ui_A_propos(object):
         self.label_4.setWordWrap(True)
         self.label_4.setOpenExternalLinks(True)
         self.label_4.setObjectName(_fromUtf8("label_4"))
-        self.gridLayout_3.addWidget(self.label_4, 3, 0, 1, 1)
-        self.label_3 = QtGui.QLabel(self.groupBox_2)
-        self.label_3.setMaximumSize(QtCore.QSize(120, 90))
-        self.label_3.setText(_fromUtf8(""))
-        self.label_3.setPixmap(QtGui.QPixmap(_fromUtf8(":/plugins/Paprika/resources/logo_SIG.jpg")))
-        self.label_3.setScaledContents(True)
-        self.label_3.setObjectName(_fromUtf8("label_3"))
-        self.gridLayout_3.addWidget(self.label_3, 2, 0, 1, 1)
+        self.gridLayout_3.addWidget(self.label_4, 2, 0, 1, 1)
         self.verticalLayout_3.addLayout(self.gridLayout_3)
         self.horizontalLayout_2.addWidget(self.groupBox_2)
         self.verticalLayout.addLayout(self.horizontalLayout_2)
         self.verticalLayout_2.addLayout(self.verticalLayout)
-        self.buttonBox = QtGui.QDialogButtonBox(A_propos)
-        self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.Ok)
-        self.buttonBox.setObjectName(_fromUtf8("buttonBox"))
-        self.verticalLayout_2.addWidget(self.buttonBox)
 
         self.retranslateUi(A_propos)
-        QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("accepted()")), A_propos.accept)
-        QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("rejected()")), A_propos.reject)
         QtCore.QMetaObject.connectSlotsByName(A_propos)
 
     def retranslateUi(self, A_propos):
@@ -207,7 +193,7 @@ class Ui_A_propos(object):
         self.label_12.setText(_translate("A_propos", "<a href=\"http://www.sokarst.org/\" style=\"color:#000000;text-decoration:none;\">SNO Karst</a>", None))
         self.label_15.setText(_translate("A_propos", "Région Provence Alpes Côte d\'Azur", None))
         self.label_16.setText(_translate("A_propos", "Contact :", None))
-        self.label_17.setText(_translate("A_propos", "<a href=\"mailto:chloe.ollivier@alumni.univavignon.fr?subject=Plugin Paprika\" style=\"color:#2E2EFE;text-decoration:none;\"><U>Chloe Ollivier</U></a>", None))
+        self.label_17.setText(_translate("A_propos", "<a href=\"mailto:chloe.ollivier@alumni.univ-avignon.fr?subject=Plugin Paprika\" style=\"color:#2E2EFE;text-decoration:none;\"><U>Chloe Ollivier</U></a>", None))
         self.label_18.setText(_translate("A_propos", "<a href=\"mailto:konstantinos.chalikakis@univ-avignon.fr?subject=Plugin Paprika\" style=\"color:#2E2EFE;text-decoration:none;\"><U>Konstantinos Chalikakis</U></a>", None))
         self.label_6.setText(_translate("A_propos", "<a href=\"mailto:ylecomte@sig.eu.com,yoann_lecomte31@orange.fr?subject=Plugin Paprika\" style=\"color:#2E2EFE;text-decoration:none;\"><U>Yoann Lecomte</U></a>", None))
         self.groupBox_2.setTitle(_translate("A_propos", "Design by", None))
