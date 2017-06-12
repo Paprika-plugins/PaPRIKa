@@ -14,10 +14,10 @@ def genere_carteFinale(pP,pR,pI,pKa,Carte_P, Carte_R, Carte_I, Carte_Ka, doss):
 		#croisement
 	#Preparation des Rasters pour le calcul
 	#verification de la validite des couches 
-	rCarte_I = QgsRasterLayer(str(doss)+'/Carte_I.tif', "Carte_I")
-	rCarte_P = QgsRasterLayer(str(doss)+'/Carte_P.tif', "Carte_P")
-	rCarte_Ka = QgsRasterLayer(str(doss)+'/Carte_Ka.tif', "Carte_Ka")
-	rCarte_R = QgsRasterLayer(str(doss)+'/Carte_R.tif', "rCarte_R")
+	rCarte_I = QgsRasterLayer(str(doss)+'/I_factor.tif', "I factor")
+	rCarte_P = QgsRasterLayer(str(doss)+'/P_factor.tif', "P factor")
+	rCarte_Ka = QgsRasterLayer(str(doss)+'/Ka_factor.tif', "Ka factor")
+	rCarte_R = QgsRasterLayer(str(doss)+'/R_factor.tif', "R factor")
 	print(rCarte_I.isValid(), rCarte_P.isValid(), rCarte_Ka.isValid(), rCarte_R.isValid())
 	if rCarte_I.isValid() == False:
 		print ("probleme pour ouvrir la carte I, verifiez votre raster")
