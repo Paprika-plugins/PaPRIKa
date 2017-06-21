@@ -7,15 +7,15 @@
 # This file should be included when you package your plugin.# Mandatory items:
 
 [general]
-name= PaPRIKa toolbox
+name= PaPRIKa Toolbox
 qgisMinimumVersion= 2.14.0
 description= Vulnerability mapping of Karst aquifers
 version=1.0
 
 about=Simple and quick way to create vulnerability map and associated thematic maps after PaPRIKa method.
 
-	PaPRIKa method : French guide (http://infoterre.brgm.fr/rapports/RP-57527-FR.pdf )
-	English scientific article (http://link.springer.com/article/10.1007/s10040-010-0688-8 )
+	PaPRIKa method : French guide (http://infoterre.brgm.fr/rapports/RP-57527-FR.pdf 
+	Application case : http://link.springer.com/article/10.1007/s10040-010-0688-8 
 
 tracker=sig.eu.com
 repository=ftp://plugins@ftp.onstatic-fr.setupdns.net/public/plugins/SIG/qgis/serveur_plugins/plugins/
