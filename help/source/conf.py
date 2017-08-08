@@ -41,7 +41,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Paprika'
-copyright = u'2013, SIG'
+copyright = u'2017, SIG'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

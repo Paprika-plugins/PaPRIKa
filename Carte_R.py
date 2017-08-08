@@ -82,7 +82,11 @@ def genere_carteR (doss, extension, lithology, field_lithology, structure, field
 	Band.WriteArray(ValCarteR, 0, 0)
 	Band.FlushCache()
 	Band.SetNoDataValue(6)
-			
+	
+	#fermeture des connexions
+	rLithology = None
+	rStructure = None
+	Raster = None
 	
 	
 	

@@ -66,3 +66,8 @@ def genere_carteKa(Mangin, karst_features, field_karst_features, extension, doss
 	Band.WriteArray(valCarteKa, 0, 0)
 	Band.FlushCache()
 	Band.SetNoDataValue(0)
+	
+	#fermeture des connexions
+	rKarst_features = None
+	Raster = None
+	

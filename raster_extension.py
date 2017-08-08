@@ -32,5 +32,7 @@ def genere_guide(impluvium, resolution, doss):
 	raster.SetGeoTransform((Xmin, resolution, 0, Ymax, 0, -resolution))
 	band = raster.GetRasterBand(1)
 	band.SetNoDataValue(NoData_value)
+	
+	#Fermeture des connexions
 	raster = None
 	

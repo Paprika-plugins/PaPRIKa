@@ -144,5 +144,11 @@ def genere_carteP(extension, doss, ZNS,Sol, field_sol, Epikarst, field_epikarst,
 	Band.WriteArray(ValCarteP, 0, 0)
 	Band.FlushCache()
 	Band.SetNoDataValue(6)
-
+	
+	#fermeture des connexions
+	rSol = None
+	rSinking = None
+	rZNS = None
+	rEpikarst = None
+	Raster = None
 

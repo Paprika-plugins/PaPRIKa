@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
+'''
 /***************************************************************************
  Paprika
 								 A QGIS plugin
@@ -19,7 +19,7 @@
  *   (at your option) any later version.								   *
  *																		 *
  ***************************************************************************/
-"""
+'''
 from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, Qt
 from PyQt4.QtGui import QAction, QIcon, QFileDialog, QMessageBox
 from PyQt4 import QtGui, uic, QtCore
@@ -43,16 +43,16 @@ import Carte_Ka
 import Carte_Finale
 
 class Paprika:
-	"""QGIS Plugin Implementation."""
+	'''QGIS Plugin Implementation.'''
 
 	def __init__(self, iface):
-		"""Constructor.
+		'''Constructor.
 
 		:param iface: An interface instance that will be passed to this class
 			which provides the hook by which you can manipulate the QGIS
 			application at run time.
 		:type iface: QgsInterface
-		"""
+		'''
 		# Save reference to the QGIS interface
 		self.iface = iface
 
@@ -88,7 +88,7 @@ class Paprika:
 
 	# noinspection PyMethodMayBeStatic
 	def tr(self, message):
-		"""Get the translation for a string using Qt translation API.
+		'''Get the translation for a string using Qt translation API.
 
 		We implement this ourselves since we do not inherit QObject.
 
@@ -97,7 +97,7 @@ class Paprika:
 
 		:returns: Translated version of message.
 		:rtype: QString
-		"""
+		'''
 		# noinspection PyTypeChecker,PyArgumentList,PyCallByClass
 		return QCoreApplication.translate('Paprika', message)
 
@@ -113,7 +113,7 @@ class Paprika:
 		status_tip=None,
 		whats_this=None,
 		parent=None):
-		"""Add a toolbar icon to the toolbar.
+		'''Add a toolbar icon to the toolbar.
 
 		:param icon_path: Path to the icon for this action. Can be a resource
 			path (e.g. ':/plugins/foo/bar.png') or a normal file system path.
@@ -150,7 +150,7 @@ class Paprika:
 		:returns: The action that was created. Note that the action is also
 			added to self.actions list.
 		:rtype: QAction
-		"""
+		'''
 
 		icon = QIcon(icon_path)
 		action = QAction(icon, text, parent)
@@ -177,7 +177,7 @@ class Paprika:
 
 
 	def initGui(self):
-		"""Create the menu entries and toolbar icons inside the QGIS GUI."""
+		'''Create the menu entries and toolbar icons inside the QGIS GUI.'''
 
 		icon_path = ':/plugins/Paprika/icon.png'
 		self.add_action(
@@ -190,7 +190,7 @@ class Paprika:
 	#--------------------------------------------------------------------------
 
 	def onClosePlugin(self):
-		"""Cleanup necessary items here when plugin dockwidget is closed"""
+		'''Cleanup necessary items here when plugin dockwidget is closed'''
 
 		#print "** CLOSING Paprika"
 
@@ -207,7 +207,7 @@ class Paprika:
 
 
 	def unload(self):
-		"""Removes the plugin menu item and icon from QGIS GUI."""
+		'''Removes the plugin menu item and icon from QGIS GUI.'''
 
 		#print "** UNLOAD Paprika"
 
@@ -221,7 +221,7 @@ class Paprika:
 
 	#--------------------------------------------------------------------------
 	def run(self):
-		"""Run method that loads and starts the plugin"""
+		'''Run method that loads and starts the plugin'''
 		
 			
 		if not self.pluginIsActive:
@@ -274,7 +274,7 @@ class Paprika:
 			# peuplement de la comboBox du critere de Mangin
 			self.dockwidget.comboBox_MANGIN.addItems(['1','2','3','4','5'])
 		
-			# peuplement des ComboBox des champs et gestion des critères optionnels
+			# peuplement des ComboBox des champs et gestion des criteres optionnels
 				#SOL
 			self.dockwidget.mFieldComboBox_SOL.setFilters(QgsFieldProxyModel.Numeric)
 			self.dockwidget.mFieldComboBox_SOL.setLayer(self.dockwidget.mMapLayerComboBox_SOL.currentLayer())
@@ -370,15 +370,16 @@ class Paprika:
 			self.dockwidget.label_KARST_FEATURES.setStyleSheet('color: grey')
 			self.dockwidget.label_index_KARST_FEATURES.setStyleSheet('color: grey')
 	
-		########################################## FIN DE LA GESTION DE L'INTERFACE ########################################
+	########################################## FIN DE LA GESTION DE L'INTERFACE ########################################
+	
 	# fonction des push button 
 	def open_directory(self):
-		"""permet a l'utilisateur de choisir son repertoire de travail"""
+		'''permet a l'utilisateur de choisir son repertoire de travail'''
 		directory = QtGui.QFileDialog.getExistingDirectory(self.dockwidget.toolButton_dossier_travail,"Sélectionner le répertoire de travail", QgsProject.instance().fileName(), QtGui.QFileDialog.ShowDirsOnly)
 		self.dockwidget.lineEdit_dossier_travail.setText(str(QtCore.QDir.toNativeSeparators(directory)))
 	
 	def lancer_genere_guide(self):
-		"""lance la fonction de generation du guide""" 
+		'''lance la fonction de generation du guide''' 
 		if os.path.exists(self.dockwidget.lineEdit_dossier_travail.text())== False :
 			return self.showdialog('Please check if the directory of generating is filled', 'Directory missing in the system...')
 		for lyr in QgsMapLayerRegistry.instance().mapLayers().values():
@@ -388,31 +389,39 @@ class Paprika:
 		self.iface.addRasterLayer(str(self.dockwidget.lineEdit_dossier_travail.text())+'/Extension.tif','Extension')		
 	
 	def lancer_carteP(self):
-		"""test les parametres et lance la generation de la carte P"""
-		# test pour ne pas lancer la fonction sans que la verification soit correcte
+		'''test les parametres et lance la generation de la carte P'''
+	# test pour ne pas lancer la fonction sans que la verification soit correcte
 			#verifie que l'extension existe
 		if os.path.exists(self.dockwidget.lineEdit_dossier_travail.text() + '/Extension.tif')== False :
 			 return self.showdialog('Please check if the directory of generating is filled and that the guide is already generate...', 'Layer Extension missing in the system...')
-			#controle la validite des occurences des champs index
+			
+		#controle que la comboBox du champ SOL est bien remplie
+		if self.dockwidget.mFieldComboBox_SOL.currentField() == u'':
+			return self.showdialog('The index Field of Soil Protection Layer is not set...', 'Field issue...')
+		#controle la validite des occurences du champ index
 		value_sol = [feature.attribute(self.dockwidget.mFieldComboBox_SOL.currentField()) for feature in self.dockwidget.mMapLayerComboBox_SOL.currentLayer().getFeatures()]
 		if min(value_sol) < 0 or max(value_sol) > 4 or len(value_sol) == 0 :
 			return self.showdialog('The index Field of Soil Cover Layer has wrong value... (not between 0 and 4 or null)', 'Index issue...')
-		else:
-			pass
+
 		if self.dockwidget.checkBox_Epikarst.isChecked():
+			#controle que la comboBox du champ Epikarst est bien remplie
+			if self.dockwidget.mFieldComboBox_EPIKARST.currentField() == u'':
+				return self.showdialog('The index Field of Epikarst Layer is not set...', 'Field issue...')
+			#controle la validite des occurences du champ index
 			value_epikarst = [feature.attribute(self.dockwidget.mFieldComboBox_EPIKARST.currentField()) for feature in self.dockwidget.mMapLayerComboBox_EPIKARST.currentLayer().getFeatures()]
 			if min(value_epikarst) < 0 or max(value_epikarst) > 4 or len(value_epikarst) == 0 :
 				return self.showdialog('The index Field of Epikarst Layer has wrong value... (not between 0 and 4 or null)', 'Index issue...')
-			else:
-				pass
+
 		if self.dockwidget.checkBox_Sinking.isChecked():
+			#controle que la comboBox du champ Sinking Stream Catchment est bien remplie
+			if self.dockwidget.mFieldComboBox_SINKING_CATCHMENT.currentField() == u'':
+				return self.showdialog('The index Field of Sinking Stream Catchment Layer is not set...', 'Field issue...')
+			#controle la validite des occurences des champs index
 			value_sinking = [feature.attribute(self.dockwidget.mFieldComboBox_SINKING_CATCHMENT.currentField()) for feature in self.dockwidget.mMapLayerComboBox_SINKING_CATCHMENT.currentLayer().getFeatures()]
 			if min(value_sinking) < 0 or max(value_sinking) > 4 or len(value_sinking) == 0 :
 				return self.showdialog('The index''s field of Sinking catchment Layer has wrong value... (not between 0 and 4 or null)', 'Index issue...')
-			else:
-				pass
 		
-		################################ si les test sont satisfait, lance la fonction	
+	################################ si les test sont satisfait, lance la fonction	
 		#recupere l'extension
 		for lyr in QgsMapLayerRegistry.instance().mapLayers().values():
 			if lyr.name() == "Extension": 
@@ -476,26 +485,33 @@ class Paprika:
 		self.showdialog('P factor map created wih success!', 'Well done!')
 		
 	def lancer_carteR(self):
-		"""teste les parametres et lance la generation de la carte R"""
+		'''teste les parametres et lance la generation de la carte R'''
 		
 		############################# test pour ne pas lancer la fonction sans que la verification soit correcte
 			#verifie que l'extension existe
 		if os.path.exists(self.dockwidget.lineEdit_dossier_travail.text() + '/Extension.tif')== False :
 			return self.showdialog('Please check if the directory of generating is filled and that the guide is already generate...', 'Layer Extension missing in the system...')
-			#controle la validite des occurences du champ index
+			
 				#LITHOLOGY
+		#controle que la comboBox du champ est bien remplie
+		if self.dockwidget.mFieldComboBox_ROCHE.currentField() == u'':
+				return self.showdialog('The index Field of Lithology Layer is not set...', 'Field issue...')
+		#controle la validite des occurences du champ index		
 		value_lithology = [feature.attribute(self.dockwidget.mFieldComboBox_ROCHE.currentField()) for feature in self.dockwidget.mMapLayerComboBox_ROCHE.currentLayer().getFeatures()]
 		if min(value_lithology) < 0 or max(value_lithology) > 4 or len(value_lithology) == 0 :
 			return self.showdialog('The index Field of Lithology Layer has wrong value... (not between 0 and 4 or null)', 'Index issue...')
-		else:
-			pass
+
 				#STRUCTURE
 		if self.dockwidget.checkBox_STRUCTURE.isChecked():
+			#controle que la comboBox du champ Structure est bien remplie
+			if self.dockwidget.mFieldComboBox_STRUCTURE.currentField() == u'':
+				return self.showdialog('The index Field of Structure Layer is not set...', 'Field issue...')
+			
 			value_structure = [feature.attribute(self.dockwidget.mFieldComboBox_STRUCTURE.currentField()) for feature in self.dockwidget.mMapLayerComboBox_STRUCTURE.currentLayer().getFeatures()]
 			if min(value_structure) < 0 or max(value_structure) > 4 or len(value_structure) == 0 :
 				return self.showdialog('The index Field of Structure Layer has wrong value... (not between 0 and 4 or null)', 'Index issue...')
-			else:
-				pass
+
+
 		
 		################################ si les test sont satisfait, lance la fonction	
 		#genere les parametres a passer
@@ -549,20 +565,25 @@ class Paprika:
 		self.showdialog('R factor map created wih success!', 'Well done!')
 			
 	def lancer_carteI(self):
-		"""teste les parametres et lance la generation de la carte I"""
+		'''teste les parametres et lance la generation de la carte I'''
 		########################## test pour ne pas lancer la fonction sans que la verification soit correcte
 			#verifie que l'extension exist
 		if os.path.exists(self.dockwidget.lineEdit_dossier_travail.text() + '/Extension.tif')== False :
 			return self.showdialog('Please check if the directory of generating is filled and that the guide is already generate...', 'Layer Extension missing in the system...')
-			#controle la validite des occurences des champs index
+			
 				#OBJETS_EXOKARSTIQUES
 		if self.dockwidget.checkBox_OBJETS_EXOKARSTIQUES.isChecked():
+			#controle que la comboBox du champ est bien remplie
+			if self.dockwidget.mFieldComboBox_OBJETS_EXOKARSTIQUES.currentField() == u'':
+				return self.showdialog('The index Field of Karst features Layer is not set...', 'Field issue...')
+			#controle la validite des occurences des champs index
 			value_objets_exokarstiques = [feature.attribute(self.dockwidget.mFieldComboBox_OBJETS_EXOKARSTIQUES.currentField()) for feature in self.dockwidget.mMapLayerComboBox_OBJETS_EXOKARSTIQUES.currentLayer().getFeatures()]
 			if min(value_objets_exokarstiques) < 0 or max(value_objets_exokarstiques) > 4 :
 				return self.showdialog('The index Field of Karst features Layer has wrong value... (not between 0 and 4 or null)', 'Index issue...')
-			
+
+
 		######################## Si les tests sont satisfait lance la fonction
-			#genere les règles de reclassement selon les paramètres donnés par l'utilisateur
+			#genere les regles de reclassement selon les parametres donnes par l'utilisateur
 		self.generate_reclass_rules_slope(self.dockwidget.spinBox_first_threshold.value(),self.dockwidget.spinBox_second_threshold.value(),self.dockwidget.spinBox_third_threshold.value())
 			#recupere l'extension
 		for lyr in QgsMapLayerRegistry.instance().mapLayers().values():
@@ -570,7 +591,7 @@ class Paprika:
 				layer = QgsRasterLayer(lyr.source(),"extension")
 			else :
 				pass
-		#genere les parametre a passer
+		#genere les parametres a passer
 			#PENTE
 		pente = self.dockwidget.mMapLayerComboBox_PENTE.currentLayer()
 			#OBJETS_EXOKARSTIQUES
@@ -613,18 +634,22 @@ class Paprika:
 		self.showdialog('I factor map created wih success!', 'Well done!')
 		
 	def lancer_carteKa(self):
-		"""teste les parametres et lance la generation de la carte Ka"""
+		'''teste les parametres et lance la generation de la carte Ka'''
 		########################## test pour ne pas lancer la fonction sans que la verification soit correcte
 			#verifie que l'extension exist
 		if os.path.exists(self.dockwidget.lineEdit_dossier_travail.text() + '/Extension.tif')== False :
 			return self.showdialog('Please check if the directory of generating is filled and that the guide is already generate...', 'Layer Extension missing in the system...')
+		
+		if self.dockwidget.checkBox_KARST_FEATURES.isChecked():		
+			#controle que la comboBox du champ est bien remplie
+			if self.dockwidget.mFieldComboBox_KARST_FEATURES.currentField() == u'':
+				return self.showdialog('The index Field of Karst features Layer is not set...', 'Field issue...')
 			#controle la validite des occurences des champs index
 				#KARST_FEATURES
-		value_karst_features = [feature.attribute(self.dockwidget.mFieldComboBox_KARST_FEATURES.currentField()) for feature in self.dockwidget.mMapLayerComboBox_KARST_FEATURES.currentLayer().getFeatures()]
-		if min(value_karst_features) < 0 or max(value_karst_features) > 4 or len(value_karst_features) == 0 :
-			return self.showdialog('The index Field of Karst features Layer has wrong value... (not between 0 and 4 or null)', 'Index issue...')
-		else:
-			pass
+			value_karst_features = [feature.attribute(self.dockwidget.mFieldComboBox_KARST_FEATURES.currentField()) for feature in self.dockwidget.mMapLayerComboBox_KARST_FEATURES.currentLayer().getFeatures()]
+			if min(value_karst_features) < 0 or max(value_karst_features) > 4 or len(value_karst_features) == 0 :
+				return self.showdialog('The index Field of Karst features Layer has wrong value... (not between 0 and 4 or null)', 'Index issue...')
+		
 		############################# Si les tests sont satisfait lance la fonction
 		#recupere l'extension
 		for lyr in QgsMapLayerRegistry.instance().mapLayers().values():
@@ -669,7 +694,7 @@ class Paprika:
 		self.showdialog('Ka factor map created wih success!', 'Well done!')
 	
 	def lancer_carteFinale(self):
-		"""fonction de generation, mise en forme et chargement de la carte finale"""
+		'''fonction de generation, mise en forme et chargement de la carte finale'''
 		if os.path.exists(self.dockwidget.lineEdit_dossier_travail.text())== False :
 			return self.showdialog('Please check if the directory of generating is filled', 'Directory missing in the system...')
 		#verifie la ponderation
@@ -713,7 +738,7 @@ class Paprika:
 		return self.showdialog('Final map created wih success!', 'Well done!')
 	
 	def showdialog (self, text, title):
-		"""fonction permettant d'afficher des messages a l'utilisateur"""
+		'''fonction permettant d'afficher des messages a l'utilisateur'''
 		msg = QMessageBox()
 		msg.setIcon(QMessageBox.Warning)
 		msg.setText(text)
@@ -722,27 +747,30 @@ class Paprika:
 		msg.exec_()
 	
 	def open_Apropos(self):
-		"""fonction d'ouverture de la fenetre A propos, connectee a son PushButton""" 
+		'''fonction d'ouverture de la fenetre A propos, connectee a son PushButton'''
 		Dialog = QtGui.QDialog()
 		md = Ui_A_propos()
 		md.setupUi(Dialog)
 		Dialog.exec_()
 	
 	def download_methodo(self):
-		"""fonction d'ouverture de la methodologie officielle PaPRIKa"""
+		'''fonction d'ouverture de la methodologie officielle PaPRIKa'''
 		webbrowser.open_new('http://infoterre.brgm.fr/rapports/RP-57527-FR.pdf')
 		webbrowser.open_new_tab('http://link.springer.com/article/10.1007/s10040-010-0688-8')
 	
 	def open_help(self):
-		"""fonction d'ouverture de la documentation du plugin"""
+		'''fonction d'ouverture de la documentation du plugin'''
 		os.startfile(os.path.dirname(os.path.abspath(__file__))+'/doc/Guide_utilisation.pdf')
 	
 	def generate_reclass_rules_slope(self,first,second,third):
-		"""fonction de generation du fichier .txt des regles de reclassement de la pente, le fichier est genere dans le repertoire du plugin"""
+		'''fonction de generation du fichier .txt des regles de reclassement de la pente, le fichier est genere dans le repertoire du plugin'''
 		reclass_rules = open(os.path.dirname(os.path.abspath(__file__))+'/reclass_rules/reclass_rules_slope.txt', 'w')
 		reclass_rules.write('0 thru ' + str(first) + '= 4\n')
 		reclass_rules.write(str(first) + ' thru ' + str(second) + '= 3\n')
 		reclass_rules.write(str(second) + ' thru ' + str(third) + '= 2\n')
 		reclass_rules.write(str(third) + ' thru 100' + '= 1')
 		reclass_rules.close()
-		
+	
+	def update_log(self, message):
+		'''ajout des messages a l'utilisateur dans une fenetre de log'''
+		#to do

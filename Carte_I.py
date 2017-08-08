@@ -72,3 +72,9 @@ def genere_carteI(doss, extension, dem, reclass_rules_pente,exokarst,field_exoka
 	Band.FlushCache()
 	Band.SetNoDataValue(0)
 	print 'Done!'
+	
+	#fermeture des connexions
+	rPente = None
+	rExokarst = None
+	rSlope = None
+	Raster = None

@@ -102,3 +102,10 @@ def genere_carteFinale(pP,pR,pI,pKa,Carte_P, Carte_R, Carte_I, Carte_Ka, doss):
 	os.remove(str(doss)+'/rVulnerability_Map.tif')
 	os.remove(str(doss)+'/rVulnerability_Map.tfw')
 	#rCarte_Finale = QgsRasterLayer(str(doss)+'/Vulnerability_Map.tif', "Vulnerability Map")
+	
+	#fermeture des connexions
+	rCarte_I = None
+	rCarte_P = None
+	rCarte_Ka = None
+	rCarte_R = None
+	
