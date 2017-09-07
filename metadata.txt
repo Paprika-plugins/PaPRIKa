@@ -17,8 +17,8 @@ about=Simple and quick way to create vulnerability map and associated thematic m
 	PaPRIKa method : French guide (http://infoterre.brgm.fr/rapports/RP-57527-FR.pdf 
 	Application case : http://link.springer.com/article/10.1007/s10040-010-0688-8 
 
-tracker=sig.eu.com
-repository=ftp://plugins@ftp.onstatic-fr.setupdns.net/public/plugins/SIG/qgis/serveur_plugins/plugins/
+tracker=https://github.com/Yolecomte/PaPRIKa
+#repository=ftp://plugins@ftp.onstatic-fr.setupdns.net/public/plugins/SIG/qgis/serveur_plugins/plugins/
 # End of mandatory metadata
 
 # Recommended items:
@@ -30,7 +30,7 @@ changelog=
 # Tags are comma separated with spaces allowed
 tags= PaPRIKa, vector, raster, vulnerability, karst
 
-homepage=ftp://plugins@ftp.onstatic-fr.setupdns.net/public/plugins/SIG/qgis/serveur_plugins/plugins/
+homepage=https://github.com/Yolecomte/PaPRIKa
 category=Plugins
 icon=icon.png
 # experimental flag
