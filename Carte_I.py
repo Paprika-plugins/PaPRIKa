@@ -9,10 +9,14 @@ def genere_carteI(doss, extension, dem, reclass_rules_pente,exokarst,field_exoka
 	#creation du raster Pente
 	processing.runalg("gdalogr:slope",dem,1,False,False,True,1,str(doss)+'/rPente.tif')
 	rPente = QgsRasterLayer(str(doss)+'/rPente.tif', "rPente")
-	#creation du raster Exokarst
-	copyfile(str(doss)+'/Extension.tif',str(doss)+'/rExokarst.tif')
-	processing.runalg("gdalogr:rasterize_over", exokarst, field_exokarst, str(doss)+'/rExokarst.tif')
-	rExokarst = QgsRasterLayer(str(doss)+'/rExokarst.tif', "rExokarst")
+	print rPente.isValid()
+	#creation du raster Exokarst si besoin
+	if field_exokarst is None:
+		rExokarst = None
+	else:
+		copyfile(str(doss)+'/Extension.tif',str(doss)+'/rExokarst.tif')
+		processing.runalg("gdalogr:rasterize_over", exokarst, field_exokarst, str(doss)+'/rExokarst.tif')
+		rExokarst = QgsRasterLayer(str(doss)+'/rExokarst.tif', "rExokarst")
 
 	#recuperation des bornes XY de la zone
 	extension1 = gdal.Open(extension.source())
@@ -26,29 +30,28 @@ def genere_carteI(doss, extension, dem, reclass_rules_pente,exokarst,field_exoka
 	print(StrExtent)
 
 	#reclassement de la pente
-	processing.runalg("grass7:r.reclass", rPente, reclass_rules_pente, StrExtent, ExtentInfo[1], str(doss)+'/Slope.tif')
-	src_ds_slope = gdal.Open(str(doss)+'/Slope.tif')
-	driver_slope = gdal.GetDriverByName("GTiff") 
-	dst_ds_slope = driver_slope.CreateCopy(str(doss)+'/rSlope.tif', src_ds_slope, 0 )
-	src_ds_slope = None
-	dst_ds_slope = None
-	os.remove(str(doss)+'/Slope.tif')
-	os.remove(str(doss)+'/Slope.tfw')
-	rSlope = QgsRasterLayer(str(doss)+'/rSlope.tif', "rSlope")
+	processing.runalg("grass7:r.reclass", rPente, reclass_rules_pente,"", StrExtent, ExtentInfo[1], str(doss)+'/Slope.tif')
+	rSlope = QgsRasterLayer(str(doss)+'/Slope.tif', "rSlope")
 	print 'ok'
-
+	rPente = None
 	#preparation des variables pour le croisement
 	val_i = range(0, extension1.RasterXSize, 1)
 	val_j = range(0, extension1.RasterYSize, 1)
 	pSlope = rSlope.dataProvider()
-	pExokarst = rExokarst.dataProvider()
+	if rExokarst is None:
+		pExokarst = None
+	else:
+		pExokarst = rExokarst.dataProvider()
 	ValCarteI= numpy.zeros((extension1.RasterYSize, extension1.RasterXSize), numpy.int16)
 	#iteration sur les pixels: selection de la valeur la plus faible et ecriture dans l'array
 	for j in val_j:
 		for i in val_i:
 			pos = QgsPoint((ExtentInfo[0] + i * int(ExtentInfo[1])) - int(ExtentInfo[1])/2, (ExtentInfo[3] - j * int(ExtentInfo[1])) - int(ExtentInfo[1])/2)
 			valSlope = pSlope.identify(pos, QgsRaster.IdentifyFormatValue).results()[1]
-			valExokarst = pExokarst.identify(pos, QgsRaster.IdentifyFormatValue).results()[1]
+			if pExokarst is None:
+				valExokarst = 0
+			else:
+				valExokarst = pExokarst.identify(pos, QgsRaster.IdentifyFormatValue).results()[1]
 			if valSlope <= valExokarst: 
 				 if valExokarst is None or valSlope is None:
 					ValCarteI[j,i] = 0
@@ -74,7 +77,6 @@ def genere_carteI(doss, extension, dem, reclass_rules_pente,exokarst,field_exoka
 	print 'Done!'
 	
 	#fermeture des connexions
-	rPente = None
 	rExokarst = None
 	rSlope = None
 	Raster = None

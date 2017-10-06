@@ -760,7 +760,7 @@ class Paprika:
 	
 	def open_help(self):
 		'''fonction d'ouverture de la documentation du plugin'''
-		os.startfile(os.path.dirname(os.path.abspath(__file__))+'/doc/Guide_utilisation.pdf')
+		os.startfile(os.path.dirname(os.path.abspath(__file__))+'/doc/Paprika_Toolbox_User_guide.pdf')
 	
 	def generate_reclass_rules_slope(self,first,second,third):
 		'''fonction de generation du fichier .txt des regles de reclassement de la pente, le fichier est genere dans le repertoire du plugin'''
@@ -768,7 +768,7 @@ class Paprika:
 		reclass_rules.write('0 thru ' + str(first) + '= 4\n')
 		reclass_rules.write(str(first) + ' thru ' + str(second) + '= 3\n')
 		reclass_rules.write(str(second) + ' thru ' + str(third) + '= 2\n')
-		reclass_rules.write(str(third) + ' thru 100' + '= 1')
+		reclass_rules.write(str(third) + ' thru 9999999' + '= 1')
 		reclass_rules.close()
 	
 	def update_log(self, message):
