@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>643</width>
-    <height>445</height>
+    <width>690</width>
+    <height>537</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -36,7 +36,7 @@
          <number>0</number>
         </property>
         <property name="text">
-         <string>PaPRIKa</string>
+         <string>PaPRIKa 0.1</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -113,7 +113,7 @@
       <item>
        <widget class="QLabel" name="label">
         <property name="text">
-         <string>Directory for generating maps</string>
+         <string>Main repository file </string>
         </property>
        </widget>
       </item>
@@ -305,7 +305,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>4</number>
       </property>
       <property name="iconSize">
        <size>
@@ -408,7 +408,7 @@
                </font>
               </property>
               <property name="text">
-               <string>Index between 1 and 5</string>
+               <string>Index field (0 to 4)</string>
               </property>
              </widget>
             </item>
@@ -519,7 +519,7 @@
                </font>
               </property>
               <property name="text">
-               <string>Raster with values between 1 and 4</string>
+               <string>1 band raster (0 to 4)</string>
               </property>
              </widget>
             </item>
@@ -605,7 +605,7 @@
                </font>
               </property>
               <property name="text">
-               <string>Index between 1 and 4</string>
+               <string>Index field (1 to 4)</string>
               </property>
              </widget>
             </item>
@@ -714,7 +714,7 @@
                </font>
               </property>
               <property name="text">
-               <string>Index between 1 and 4</string>
+               <string>Index field (0 to 4)</string>
               </property>
              </widget>
             </item>
@@ -873,7 +873,7 @@
                </font>
               </property>
               <property name="text">
-               <string>Index between 1 and 4</string>
+               <string>Index field (0 to 4)</string>
               </property>
              </widget>
             </item>
@@ -963,7 +963,7 @@
                </font>
               </property>
               <property name="text">
-               <string>Index between 1 and 4</string>
+               <string>Index field</string>
               </property>
              </widget>
             </item>
@@ -1370,7 +1370,7 @@
                </font>
               </property>
               <property name="text">
-               <string>Index between 1 and 4</string>
+               <string>Index field</string>
               </property>
              </widget>
             </item>
@@ -1576,7 +1576,7 @@
                </font>
               </property>
               <property name="text">
-               <string>Index between 1 and 4</string>
+               <string>Index field</string>
               </property>
              </widget>
             </item>
@@ -1625,7 +1625,7 @@
                  </font>
                 </property>
                 <property name="text">
-                 <string>The Mangin will give a general index to the impluvium according to this rules : </string>
+                 <string>After proposed Mangin Index a global vulnerability index will be generated for all catchment area</string>
                 </property>
                 <property name="wordWrap">
                  <bool>true</bool>
@@ -1643,7 +1643,7 @@
                    </font>
                   </property>
                   <property name="text">
-                   <string>1 will give an index of 2</string>
+                   <string>Mangin index of 1 = vulnerability index of 2</string>
                   </property>
                  </widget>
                 </item>
@@ -1656,7 +1656,7 @@
                    </font>
                   </property>
                   <property name="text">
-                   <string>2 will give an index of 3</string>
+                   <string>Mangin index of 2 = vulnerability index of 3</string>
                   </property>
                  </widget>
                 </item>
@@ -1669,7 +1669,7 @@
                    </font>
                   </property>
                   <property name="text">
-                   <string>3 will give an index of 4</string>
+                   <string>Mangin index of 3 = vulnerability index of 4</string>
                   </property>
                  </widget>
                 </item>
@@ -1682,7 +1682,7 @@
                    </font>
                   </property>
                   <property name="text">
-                   <string>4 will give an index of 4</string>
+                   <string>Mangin index of 4 = vulnerability index of 4</string>
                   </property>
                  </widget>
                 </item>
@@ -1695,7 +1695,7 @@
                    </font>
                   </property>
                   <property name="text">
-                   <string>5 will give an index of 1</string>
+                   <string>Mangin index of 5 = vulnerability index of 1</string>
                   </property>
                  </widget>
                 </item>
