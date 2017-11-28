@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>462</width>
+    <width>473</width>
     <height>398</height>
    </rect>
   </property>
@@ -40,7 +40,7 @@
           </font>
          </property>
          <property name="title">
-          <string>Develop an fund by</string>
+          <string>Contributors</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_2">
           <item row="0" column="0">
