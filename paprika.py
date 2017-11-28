@@ -760,7 +760,10 @@ class Paprika:
 	
 	def open_help(self):
 		'''fonction d'ouverture de la documentation du plugin'''
-		os.startfile(os.path.dirname(os.path.abspath(__file__))+'/doc/Paprika_Toolbox_User_guide.pdf')
+		if os.name == 'nt':
+			os.startfile(os.path.dirname(os.path.abspath(__file__))+'/doc/Paprika_Toolbox_User_guide.pdf')
+		elif os.name == 'posix':
+			subprocess.call(["xdg-open", os.path.dirname(os.path.abspath(__file__))+'/doc/Paprika_Toolbox_User_guide.pdf'])
 	
 	def generate_reclass_rules_slope(self,first,second,third):
 		'''fonction de generation du fichier .txt des regles de reclassement de la pente, le fichier est genere dans le repertoire du plugin'''
