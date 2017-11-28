@@ -34,6 +34,7 @@ import sys
 from qgis.gui import *
 from qgis.core import *
 import webbrowser
+import subprocess
 
 import raster_extension
 import Carte_P
