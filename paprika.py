@@ -304,11 +304,6 @@ class Paprika:
 			self.dockwidget.mFieldComboBox_OBJETS_EXOKARSTIQUES.setLayer(self.dockwidget.mMapLayerComboBox_OBJETS_EXOKARSTIQUES.currentLayer())
 			self.dockwidget.mMapLayerComboBox_OBJETS_EXOKARSTIQUES.layerChanged.connect(self.dockwidget.mFieldComboBox_OBJETS_EXOKARSTIQUES.setLayer)
 			self.dockwidget.checkBox_OBJETS_EXOKARSTIQUES.stateChanged.connect(self.desactive_widget_objets_exokarstiques)
-				#KARST FEATURES Ka
-			self.dockwidget.mFieldComboBox_KARST_FEATURES.setFilters(QgsFieldProxyModel.Numeric)
-			self.dockwidget.mFieldComboBox_KARST_FEATURES.setLayer(self.dockwidget.mMapLayerComboBox_KARST_FEATURES.currentLayer())
-			self.dockwidget.mMapLayerComboBox_KARST_FEATURES.layerChanged.connect(self.dockwidget.mFieldComboBox_KARST_FEATURES.setLayer)
-			self.dockwidget.checkBox_KARST_FEATURES.stateChanged.connect(self.desactive_widget_karst_features)
 				
 	
 	def desactive_widget_Epikarst(self):
@@ -362,21 +357,17 @@ class Paprika:
 	def desactive_widget_karst_features(self):
 		if self.dockwidget.checkBox_KARST_FEATURES.isChecked():
 			self.dockwidget.mMapLayerComboBox_KARST_FEATURES.setEnabled(True)
-			self.dockwidget.mFieldComboBox_KARST_FEATURES.setEnabled(True)
 			self.dockwidget.label_KARST_FEATURES.setStyleSheet('color: black')
-			self.dockwidget.label_index_KARST_FEATURES.setStyleSheet('color: black')
 		else:
 			self.dockwidget.mMapLayerComboBox_KARST_FEATURES.setDisabled(True)
-			self.dockwidget.mFieldComboBox_KARST_FEATURES.setDisabled(True)
 			self.dockwidget.label_KARST_FEATURES.setStyleSheet('color: grey')
-			self.dockwidget.label_index_KARST_FEATURES.setStyleSheet('color: grey')
 	
 	########################################## FIN DE LA GESTION DE L'INTERFACE ########################################
 	
 	# fonction des push button 
 	def open_directory(self):
 		'''permet a l'utilisateur de choisir son repertoire de travail'''
-		directory = QtGui.QFileDialog.getExistingDirectory(self.dockwidget.toolButton_dossier_travail,"Sélectionner le répertoire de travail", QgsProject.instance().fileName(), QtGui.QFileDialog.ShowDirsOnly)
+		directory = QtGui.QFileDialog.getExistingDirectory(self.dockwidget.toolButton_dossier_travail,"SÃ©lectionner le rÃ©pertoire de travail", QgsProject.instance().fileName(), QtGui.QFileDialog.ShowDirsOnly)
 		self.dockwidget.lineEdit_dossier_travail.setText(str(QtCore.QDir.toNativeSeparators(directory)))
 	
 	def lancer_genere_guide(self):
@@ -640,17 +631,7 @@ class Paprika:
 			#verifie que l'extension exist
 		if os.path.exists(self.dockwidget.lineEdit_dossier_travail.text() + '/Extension.tif')== False :
 			return self.showdialog('Please check if the directory of generating is filled and that the guide is already generate...', 'Layer Extension missing in the system...')
-		
-		if self.dockwidget.checkBox_KARST_FEATURES.isChecked():		
-			#controle que la comboBox du champ est bien remplie
-			if self.dockwidget.mFieldComboBox_KARST_FEATURES.currentField() == u'':
-				return self.showdialog('The index Field of Karst features Layer is not set...', 'Field issue...')
-			#controle la validite des occurences des champs index
-				#KARST_FEATURES
-			value_karst_features = [feature.attribute(self.dockwidget.mFieldComboBox_KARST_FEATURES.currentField()) for feature in self.dockwidget.mMapLayerComboBox_KARST_FEATURES.currentLayer().getFeatures()]
-			if min(value_karst_features) < 0 or max(value_karst_features) > 4 or len(value_karst_features) == 0 :
-				return self.showdialog('The index Field of Karst features Layer has wrong value... (not between 0 and 4 or null)', 'Index issue...')
-		
+				
 		############################# Si les tests sont satisfait lance la fonction
 		#recupere l'extension
 		for lyr in QgsMapLayerRegistry.instance().mapLayers().values():
@@ -658,14 +639,13 @@ class Paprika:
 				layer = QgsRasterLayer(lyr.source(),"extension")
 			else :
 				pass
-		#genere les parametre
+		#genere les parametres
 		if self.dockwidget.checkBox_KARST_FEATURES.isChecked():
 			karst_features = self.dockwidget.mMapLayerComboBox_KARST_FEATURES.currentLayer()
-			field_karst_features = self.dockwidget.mFieldComboBox_KARST_FEATURES.currentField()
+			
 		else:
 			karst_features = None
-			field_karst_features = None
-		
+				
 		#genere le tif
 		for lyr in QgsMapLayerRegistry.instance().mapLayers().values():
 			if lyr.name() == "Ka factor": 
@@ -673,7 +653,6 @@ class Paprika:
 		Carte_Ka.genere_carteKa(
 			int(self.dockwidget.comboBox_MANGIN.currentText()),
 			karst_features,
-			field_karst_features,
 			layer, 
 			self.dockwidget.lineEdit_dossier_travail.text())
 		#genere le style et charge le tif dans QGIS
