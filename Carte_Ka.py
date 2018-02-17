@@ -1,5 +1,6 @@
 import processing
 from qgis.core import *
+from PyQt4.QtCore import QVariant
 from shutil import copyfile
 import numpy
 from osgeo import gdal, ogr, osr
@@ -7,9 +8,23 @@ from osgeo import gdal, ogr, osr
 def genere_carteKa(Mangin, karst_features, extension, doss):
     #Rasterisation et ouverture de la couche karst features
     copyfile(str(doss)+'/Extension.tif',str(doss)+'/rKarst_features.tif')
-    #Trouver une solution pour utiliser burn value (subprocess?)
-    processing.runalg("gdalogr:rasterize_over", karst_features, field_karst_features, str(doss)+'/rKarst_features.tif')
+    #Prepare karst_features datas
+    karst_features.startEditing()
+    karst_features.dataProvider().addAttributes([QgsField("temp",  QVariant.Int)])
+    karst_features.commitChanges()
+    karst_features.startEditing()
+    for feat in karst_features.getFeatures():
+        karst_features.changeAttributeValue(feat.id(),karst_features.fieldNameIndex('temp'), 4)
+    karst_features.commitChanges()
+    #process rasterization and delete temp fields
+    processing.runalg("gdalogr:rasterize_over", karst_features, 'temp', str(doss)+'/rKarst_features.tif')
+    karst_features.startEditing()
+    karst_features.dataProvider().deleteAttributes([fieldNameIndex('temp')])
+    karst_features.updateFields()
+    karst_features.commitChanges()
+
     rKarst_features = QgsRasterLayer(str(doss)+'/rKarst_features.tif','rKarst_features')
+    
     
     #Creation du raster global a partir de la classification de Mangin
         #recuperation des bornes XY de la zone
@@ -33,15 +48,12 @@ def genere_carteKa(Mangin, karst_features, extension, doss):
     pKarst_features = rKarst_features.dataProvider()
     for j in val_j:
         for i in val_i:        
-            pos = QgsPoint((ExtentInfo[0] + i * ExtentInfo[1]) - ExtentInfo[1]/2, (ExtentInfo[3] - j * ExtentInfo[1]) - ExtentInfo[1]/2)
+            pos = QgsPoint((ExtentInfo[0] + (i+1) * ExtentInfo[1]) - ExtentInfo[1]/2, (ExtentInfo[3] - j * ExtentInfo[1]) - ExtentInfo[1]/2)
             valKarst_features = pKarst_features.identify(pos, QgsRaster.IdentifyFormatValue).results()[1]
-            if valKarst_features is None:
-                valKarst_features = 0
-            index = valKarst_features + Mangin
-            if index > 4 :
+            if valKarst_features:
                 valCarteKa[j,i] = 4
             else :
-                valCarteKa[j,i] = index
+                valCarteKa[j,i] = Mangin
     
     #ecriture du raster a partir de l'array
     Raster = gdal.GetDriverByName('Gtiff').Create(str(doss)+'/Ka_factor.tif', extension1.RasterXSize, extension1.RasterYSize, 1, gdal.GDT_Byte)

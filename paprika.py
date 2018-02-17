@@ -273,7 +273,7 @@ class Paprika:
 			self.dockwidget.mMapLayerComboBox_CarteKaF.setFilters(QgsMapLayerProxyModel.RasterLayer)
 			
 			# peuplement de la comboBox du critere de Mangin
-			self.dockwidget.comboBox_MANGIN.addItems(['1','2','3','4','5'])
+			self.dockwidget.comboBox_MANGIN.addItems(['1','2','3','4'])
 		
 			# peuplement des ComboBox des champs et gestion des criteres optionnels
 				#SOL
