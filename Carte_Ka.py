@@ -19,7 +19,7 @@ def genere_carteKa(Mangin, karst_features, extension, doss):
     #process rasterization and delete temp fields
     processing.runalg("gdalogr:rasterize_over", karst_features, 'temp', str(doss)+'/rKarst_features.tif')
     karst_features.startEditing()
-    karst_features.dataProvider().deleteAttributes([fieldNameIndex('temp')])
+    karst_features.dataProvider().deleteAttributes([karst_features.fieldNameIndex('temp')])
     karst_features.updateFields()
     karst_features.commitChanges()
 
