@@ -257,6 +257,11 @@
           <height>16777215</height>
          </size>
         </property>
+        <property name="font">
+         <font>
+          <pointsize>9</pointsize>
+         </font>
+        </property>
         <property name="text">
          <string>Generate the guide</string>
         </property>
@@ -1479,13 +1484,13 @@
              <widget class="QLabel" name="label_KARSTIFICATION">
               <property name="minimumSize">
                <size>
-                <width>100</width>
+                <width>370</width>
                 <height>0</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>100</width>
+                <width>16777215</width>
                 <height>16777215</height>
                </size>
               </property>
@@ -1496,7 +1501,7 @@
                </font>
               </property>
               <property name="text">
-               <string>Mangin Index</string>
+               <string>Global vulnerability index after system hydrological behavior</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignCenter</set>
@@ -1548,7 +1553,7 @@
                </font>
               </property>
               <property name="text">
-               <string>Karst features</string>
+               <string>Karst features to consider</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignCenter</set>
@@ -1596,7 +1601,7 @@
              </font>
             </property>
             <property name="text">
-             <string>A global vulnerability index will be generated for all catchment area</string>
+             <string>A global vulnerability index will be generated for all catchment area (please refere to plug manual to see usual rules to convert Mangin index into vulneraility index)</string>
             </property>
             <property name="wordWrap">
              <bool>true</bool>
@@ -1612,7 +1617,7 @@
              </font>
             </property>
             <property name="text">
-             <string>The karst features index will add 1 to the index from Mangin if it's superior</string>
+             <string>If a karst features occurs it's area will be charge with an index of 4</string>
             </property>
            </widget>
           </item>
