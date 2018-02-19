@@ -97,7 +97,7 @@ def genere_carteP(extension, doss, ZNS,Sol, field_sol, Epikarst, field_epikarst,
 	for j in val_j:
 		for i in val_i:
 			valeur = []
-			pos = QgsPoint((ExtentInfo[0] + i * abs(ExtentInfo[1])) - abs(ExtentInfo[1])/2, (ExtentInfo[3] - j * abs(ExtentInfo[1])) - abs(ExtentInfo[1])/2)
+			pos = QgsPoint((ExtentInfo[0] + (i+1) * abs(ExtentInfo[1])) - abs(ExtentInfo[1])/2, (ExtentInfo[3] - j * abs(ExtentInfo[1])) - abs(ExtentInfo[1])/2)
 			if Sol is None:
 				valSol = 6
 			else:

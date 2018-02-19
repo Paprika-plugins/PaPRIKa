@@ -50,7 +50,7 @@ def genere_carteR (doss, extension, lithology, field_lithology, structure, field
 	for j in val_j:
 		for i in val_i:
 			valeur = []
-			pos = QgsPoint((ExtentInfo[0] + i * abs(ExtentInfo[1])) - abs(ExtentInfo[1])/2, (ExtentInfo[3] - j * abs(ExtentInfo[1])) - abs(ExtentInfo[1])/2)
+			pos = QgsPoint((ExtentInfo[0] + (i+1) * abs(ExtentInfo[1])) - abs(ExtentInfo[1])/2, (ExtentInfo[3] - j * abs(ExtentInfo[1])) - abs(ExtentInfo[1])/2)
 			if lithology is None:
 				valLithology = 6
 			else:

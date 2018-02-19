@@ -46,7 +46,7 @@ def genere_carteI(doss, extension, dem, reclass_rules_pente,exokarst,field_exoka
 	#iteration sur les pixels: selection de la valeur la plus faible et ecriture dans l'array
 	for j in val_j:
 		for i in val_i:
-			pos = QgsPoint((ExtentInfo[0] + i * int(ExtentInfo[1])) - int(ExtentInfo[1])/2, (ExtentInfo[3] - j * int(ExtentInfo[1])) - int(ExtentInfo[1])/2)
+			pos = QgsPoint((ExtentInfo[0] + (i+1) * int(ExtentInfo[1])) - int(ExtentInfo[1])/2, (ExtentInfo[3] - j * int(ExtentInfo[1])) - int(ExtentInfo[1])/2)
 			valSlope = pSlope.identify(pos, QgsRaster.IdentifyFormatValue).results()[1]
 			if pExokarst is None:
 				valExokarst = 0
