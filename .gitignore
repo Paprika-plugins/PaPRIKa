@@ -1,2 +1,11 @@
-*.pyc
-*.pyo
+*.py[oc]
+plugin_upload.py
+pylintrc
+pb_tool.cfg
+Makefile
+/help
+/i18n
+/test
+/scripts
+
+
