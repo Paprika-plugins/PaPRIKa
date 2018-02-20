@@ -5,6 +5,8 @@ Due to their high degree of heterogeneity, Karst vulnerability mapping is a chal
 
 Last but not the least, this toolbox has been create and developed by C. Ollivier from [EMMAH]( https://www6.paca.inra.fr/emmah_eng/), Avignon University (France), Y. Lecomte from [SMBS](http://www.lasorgue.com/), with the help of N. Mazzilli and K. Chalikakis. The scientific article hasn't been publishing yet. We still develop it, correct bug, and enhanced tools. Please, give us your feedback !
 
+It's compatible with QGIS 2.18. The next release (1.1) will break compatibility with QGIS 2.14 because of changes in the qgis processing module...
+
 ## Creating your thematics maps and cross it
 1. Prepare your data in vector and raster format
 2. Use P map, I map, Ka map and R map, to generate thematic maps.
