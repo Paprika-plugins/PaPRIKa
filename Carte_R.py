@@ -1,11 +1,12 @@
 from qgis.core import *
 import processing
+from PyQt4.QtCore import QVariant
 from osgeo import gdal, ogr, osr
 import numpy
 from shutil import copyfile
 import os
 
-def genere_carteR (doss, extension, lithology, field_lithology, structure, field_structure):
+def genere_carteR (doss, extension, lithology, field_lithology, structure):
 
 	#recuperation des bornes XY de la zone
 	extension1 = gdal.Open(extension.source())
@@ -29,8 +30,20 @@ def genere_carteR (doss, extension, lithology, field_lithology, structure, field
 		print 'Structure is None'
 	else:
 		copyfile(str(doss)+'/Extension.tif',str(doss)+'/rStructure.tif')
-		processing.runalg("gdalogr:rasterize_over", structure, field_structure, str(doss)+'/rStructure.tif')
-		rStructure = QgsRasterLayer(str(doss)+'/rStructure.tif', 'rStructure')
+        structure.startEditing()
+        structure.dataProvider().addAttributes([QgsField("temp",  QVariant.Int)])
+        structure.commitChanges()
+        structure.startEditing()
+        for feat in structure.getFeatures():
+            structure.changeAttributeValue(feat.id(),structure.fieldNameIndex('temp'), 4)
+        structure.commitChanges()
+        #process rasterization and delete temp fields
+        processing.runalg("gdalogr:rasterize_over", structure, 'temp', str(doss)+'/rStructure.tif')
+        structure.startEditing()
+        structure.dataProvider().deleteAttributes([structure.fieldNameIndex('temp')])
+        structure.updateFields()
+        structure.commitChanges()
+        rStructure = QgsRasterLayer(str(doss)+'/rStructure.tif', 'rStructure')
 	
 	#Preparation des donnees pour la comparaison des valeurs des rasters sur chaque pixel
 	val_i = range(0, extension1.RasterXSize, 1)
@@ -64,9 +77,9 @@ def genere_carteR (doss, extension, lithology, field_lithology, structure, field
 				if valStructure is None or valStructure == 0:
 					valStructure = 0
 				else:
-					valStructure = 1
+					valStructure = 4
 					
-			ValCarteR[j,i] = valLithology + valStructure
+			ValCarteR[j,i] = valLithology + valStructure if valLithology + valStructure <= 4 else 4
 			
 	#recuperation du systeme de coordonnees
 	source = gdal.Open(extension.source())

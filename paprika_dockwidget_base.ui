@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>646</width>
-    <height>443</height>
+    <height>465</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -310,7 +310,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>2</number>
       </property>
       <property name="iconSize">
        <size>
@@ -958,31 +958,6 @@
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="label_index_STRUCTURE">
-              <property name="font">
-               <font>
-                <pointsize>8</pointsize>
-                <weight>50</weight>
-                <italic>true</italic>
-                <bold>false</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>Index field</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QgsFieldComboBox" name="mFieldComboBox_STRUCTURE">
-              <property name="minimumSize">
-               <size>
-                <width>100</width>
-                <height>0</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-            <item>
              <spacer name="horizontalSpacer_12">
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
@@ -1048,6 +1023,60 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_5">
             <item>
+             <spacer name="horizontalSpacer_8">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>50</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_6">
+              <property name="font">
+               <font>
+                <pointsize>8</pointsize>
+                <weight>50</weight>
+                <italic>true</italic>
+                <bold>false</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_reclassement_PENTE">
+              <property name="minimumSize">
+               <size>
+                <width>300</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="font">
+               <font>
+                <weight>50</weight>
+                <bold>false</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string>Reclass rules for indexing slopes</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="0,0,0,0,0,0">
+            <item>
              <widget class="QLabel" name="label_PENTE">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
@@ -1057,13 +1086,13 @@
               </property>
               <property name="minimumSize">
                <size>
-                <width>150</width>
+                <width>30</width>
                 <height>0</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>150</width>
+                <width>30</width>
                 <height>16777215</height>
                </size>
               </property>
@@ -1085,29 +1114,14 @@
              <widget class="QgsMapLayerComboBox" name="mMapLayerComboBox_PENTE">
               <property name="minimumSize">
                <size>
-                <width>150</width>
+                <width>200</width>
                 <height>0</height>
                </size>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="label_6">
-              <property name="font">
-               <font>
-                <pointsize>8</pointsize>
-                <weight>50</weight>
-                <italic>true</italic>
-                <bold>false</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <spacer name="horizontalSpacer_8">
+             <spacer name="horizontalSpacer_18">
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
               </property>
@@ -1119,26 +1133,6 @@
               </property>
              </spacer>
             </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="1,0,0,0">
-            <item>
-             <widget class="QLabel" name="label_reclassement_PENTE">
-              <property name="font">
-               <font>
-                <weight>50</weight>
-                <bold>false</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>Reclass rules for indexing slopes</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
             <item>
              <layout class="QVBoxLayout" name="verticalLayout_12">
               <item>
@@ -1149,17 +1143,29 @@
                   <bold>false</bold>
                  </font>
                 </property>
+                <property name="frameShadow">
+                 <enum>QFrame::Plain</enum>
+                </property>
                 <property name="text">
                  <string>First threshold</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
                 </property>
                </widget>
               </item>
               <item>
                <widget class="QSpinBox" name="spinBox_first_threshold">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
                 <property name="minimumSize">
                  <size>
                   <width>50</width>
-                  <height>0</height>
+                  <height>20</height>
                  </size>
                 </property>
                 <property name="maximumSize">
@@ -1271,7 +1277,7 @@
                  <set>Qt::AlignCenter</set>
                 </property>
                 <property name="buttonSymbols">
-                 <enum>QAbstractSpinBox::PlusMinus</enum>
+                 <enum>QAbstractSpinBox::UpDownArrows</enum>
                 </property>
                 <property name="correctionMode">
                  <enum>QAbstractSpinBox::CorrectToPreviousValue</enum>
@@ -1287,6 +1293,18 @@
           </item>
           <item>
            <widget class="QLabel" name="label_23">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>40</height>
+             </size>
+            </property>
             <property name="font">
              <font>
               <weight>50</weight>
@@ -1682,7 +1700,7 @@
                </font>
               </property>
               <property name="text">
-               <string>P map</string>
+               <string>P</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignCenter</set>
@@ -1773,7 +1791,7 @@
                </font>
               </property>
               <property name="text">
-               <string>R map</string>
+               <string>R</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignCenter</set>
@@ -1861,7 +1879,7 @@
                </font>
               </property>
               <property name="text">
-               <string>I map</string>
+               <string>I</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignCenter</set>
@@ -1949,7 +1967,7 @@
                </font>
               </property>
               <property name="text">
-               <string> Ka map</string>
+               <string> Ka</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignCenter</set>
