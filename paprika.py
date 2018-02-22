@@ -248,6 +248,7 @@ class Paprika:
             QtCore.QObject.connect(self.dockwidget.pushButton_lancerCarteFinale, QtCore.SIGNAL("clicked ()"), self.lancer_carteFinale)
             QtCore.QObject.connect(self.dockwidget.toolButton_dossier_travail, QtCore.SIGNAL("clicked ()"), self.open_directory)
             QtCore.QObject.connect(self.dockwidget.pushButton_Apropos, QtCore.SIGNAL("clicked ()"),self.open_Apropos)        
+
             # connect to provide cleanup on closing of dockwidget
             self.dockwidget.closingPlugin.connect(self.onClosePlugin)
 
@@ -304,6 +305,12 @@ class Paprika:
             self.dockwidget.checkBox_OBJETS_EXOKARSTIQUES.stateChanged.connect(self.desactive_widget_objets_exokarstiques)
                 #KARST_FEATURES Ka
             self.dockwidget.checkBox_KARST_FEATURES.stateChanged.connect(self.desactive_widget_karst_features)
+
+            # mise a jour du total de la ponderation (Final Map)
+            self.dockwidget.spinBox_PondP.valueChanged.connect(self.calcul_somme_pond)
+            self.dockwidget.spinBox_PondR.valueChanged.connect(self.calcul_somme_pond)
+            self.dockwidget.spinBox_PondI.valueChanged.connect(self.calcul_somme_pond)
+            self.dockwidget.spinBox_PondKa.valueChanged.connect(self.calcul_somme_pond)
     
     def desactive_widget_Epikarst(self):
         if self.dockwidget.checkBox_Epikarst.isChecked():
@@ -356,6 +363,18 @@ class Paprika:
         else:
             self.dockwidget.mMapLayerComboBox_KARST_FEATURES.setDisabled(True)
             self.dockwidget.label_KARST_FEATURES.setStyleSheet('color: grey')
+
+    def calcul_somme_pond(self):
+        P = self.dockwidget.spinBox_PondP.value()
+        R = self.dockwidget.spinBox_PondR.value()
+        I = self.dockwidget.spinBox_PondI.value()
+        Ka = self.dockwidget.spinBox_PondKa.value()
+        new_value = P + R + I + Ka
+        self.dockwidget.label_sum_ponderation.setText(str(new_value) + ' %')
+        if new_value == 100:
+            self.dockwidget.pushButton_lancerCarteFinale.setEnabled(True)
+        else:
+            self.dockwidget.pushButton_lancerCarteFinale.setEnabled(False)
     
     ########################################## FIN DE LA GESTION DE L'INTERFACE ########################################
     
@@ -662,14 +681,6 @@ class Paprika:
         pR=self.dockwidget.spinBox_PondR.value()
         pI=self.dockwidget.spinBox_PondI.value()
         pKa=self.dockwidget.spinBox_PondKa.value()
-        if pI + pKa < 50 :
-            self.iface.messageBar().pushMessage('Anormal weight','I weight + Ka weight must be superior at 50%!', level=QgsMessageBar.WARNING, duration = 5)
-        if pI + pKa > 65 :
-            self.iface.messageBar().pushMessage('Anormal weight','I weight + Ka weight must be inferior at 65%!', level=QgsMessageBar.WARNING, duration = 5)
-        if pP + pR < 35:
-            self.iface.messageBar().pushMessage('Anormal weight','P weight + R weight must be superior at 35%!', level=QgsMessageBar.WARNING, duration = 5)
-        if pP + pR > 50:
-            self.iface.messageBar().pushMessage('Anormal weight','P weight + R weight must be inferior at 50%!', level=QgsMessageBar.WARNING, duration = 5)
         if pI + pKa + pP + pR != 100:
             return self.showdialog('weight sum must be egal at 100%!', 'invalid weight...')
             
