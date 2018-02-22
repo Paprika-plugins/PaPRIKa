@@ -7,7 +7,6 @@ from shutil import copyfile
 import os
 
 def genere_carteR (doss, extension, lithology, field_lithology, structure):
-
 	#recuperation des bornes XY de la zone
 	extension1 = gdal.Open(extension.source())
 	ExtentInfo = extension1.GetGeoTransform()

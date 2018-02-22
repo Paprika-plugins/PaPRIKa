@@ -30,8 +30,12 @@ def genere_carteI(doss, extension, dem, reclass_rules_pente,exokarst,field_exoka
 	print(StrExtent)
 
 	#reclassement de la pente
-	processing.runalg("grass7:r.reclass", rPente, reclass_rules_pente,"", StrExtent, ExtentInfo[1], str(doss)+'/Slope.tif')
-	rSlope = QgsRasterLayer(str(doss)+'/Slope.tif', "rSlope")
+    if qgis.core.QGis.QGIS_VERSION_INT > 21800 :
+        processing.runalg("grass7:r.reclass", rPente, reclass_rules_pente,"", StrExtent, ExtentInfo[1], str(doss)+'/Slope.tif')
+    else :
+        processing.runalg("grass7:r.reclass", rPente, reclass_rules_pente, StrExtent, ExtentInfo[1], str(doss)+'/Slope.tif')
+
+    rSlope = QgsRasterLayer(str(doss)+'/Slope.tif', "rSlope")
 	print 'ok'
 	rPente = None
 	#preparation des variables pour le croisement
