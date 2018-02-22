@@ -310,7 +310,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>4</number>
+       <number>2</number>
       </property>
       <property name="iconSize">
        <size>
@@ -1423,7 +1423,7 @@
            </layout>
           </item>
           <item>
-           <widget class="QLabel" name="label_25">
+           <widget class="QLabel" name="label_text_I">
             <property name="font">
              <font>
               <weight>50</weight>

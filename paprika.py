@@ -350,11 +350,13 @@ class Paprika:
             self.dockwidget.mFieldComboBox_OBJETS_EXOKARSTIQUES.setEnabled(True)
             self.dockwidget.label_OBJETS_EXOKARSTIQUES.setStyleSheet('color: black')
             self.dockwidget.label_index_OBJETS_EXOKARSTIQUES.setStyleSheet('color: black')
+            self.dockwidget.label_text_I.setStyleSheet('color: black')
         else:
             self.dockwidget.mMapLayerComboBox_OBJETS_EXOKARSTIQUES.setDisabled(True)
             self.dockwidget.mFieldComboBox_OBJETS_EXOKARSTIQUES.setDisabled(True)
             self.dockwidget.label_OBJETS_EXOKARSTIQUES.setStyleSheet('color: grey')
             self.dockwidget.label_index_OBJETS_EXOKARSTIQUES.setStyleSheet('color: grey')
+            self.dockwidget.label_text_I.setStyleSheet('color: grey')
         
     def desactive_widget_karst_features(self):
         if self.dockwidget.checkBox_KARST_FEATURES.isChecked():
