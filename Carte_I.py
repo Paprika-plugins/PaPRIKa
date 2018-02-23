@@ -9,7 +9,6 @@ def genere_carteI(doss, extension, dem, reclass_rules_pente,exokarst,field_exoka
     #creation du raster Pente
     processing.runalg("gdalogr:slope",dem,1,False,False,True,1,str(doss)+'/rPente.tif')
     rPente = QgsRasterLayer(str(doss)+'/rPente.tif', "rPente")
-    print rPente.isValid()
     #creation du raster Exokarst si besoin
     if field_exokarst is None:
         rExokarst = None
@@ -27,7 +26,6 @@ def genere_carteI(doss, extension, dem, reclass_rules_pente,exokarst,field_exoka
     Ymax = str(ExtentInfo[3] + ExtentInfo[5] * extension1.RasterYSize)
     Extent =(Xmin, Xmax, Ymax, Ymin)
     StrExtent = ','.join(Extent)
-    print(StrExtent)
 
     #reclassement de la pente
     if QGis.QGIS_VERSION_INT > 21800:
@@ -36,7 +34,6 @@ def genere_carteI(doss, extension, dem, reclass_rules_pente,exokarst,field_exoka
         processing.runalg("grass7:r.reclass", rPente, reclass_rules_pente, StrExtent, ExtentInfo[1], str(doss)+'/Slope.tif')
 
     rSlope = QgsRasterLayer(str(doss)+'/Slope.tif', "rSlope")
-    print 'ok'
     rPente = None
     #preparation des variables pour le croisement
     val_i = range(0, extension1.RasterXSize, 1)
@@ -73,7 +70,6 @@ def genere_carteI(doss, extension, dem, reclass_rules_pente,exokarst,field_exoka
     Band.WriteArray(ValCarteI, 0, 0)
     Band.FlushCache()
     Band.SetNoDataValue(0)
-    print 'Done!'
     
     #fermeture des connexions
     rExokarst = None

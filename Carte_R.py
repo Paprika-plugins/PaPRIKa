@@ -16,8 +16,6 @@ def genere_carteR (doss, extension, lithology, field_lithology, structure):
     Ymax = str(ExtentInfo[3] + ExtentInfo[5] * extension1.RasterYSize)
     Extent = Xmin,Xmax,Ymax,Ymin
     StrExtent = ','.join(Extent)
-    print ExtentInfo
-    print StrExtent
     
     #Rasterisation et ouverture de la couche Lithology
     copyfile(str(doss)+'/Extension.tif',str(doss)+'/rLithology.tif')
@@ -26,7 +24,7 @@ def genere_carteR (doss, extension, lithology, field_lithology, structure):
     
     #Rasterisation et ouverture de la couche Structure
     if structure is None:
-        print 'Structure is None'
+        pass
     else:
         copyfile(str(doss)+'/Extension.tif',str(doss)+'/rStructure.tif')
         structure.startEditing()

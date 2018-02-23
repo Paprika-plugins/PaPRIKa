@@ -690,8 +690,26 @@ class Paprika:
         for lyr in QgsMapLayerRegistry.instance().mapLayers().values():
             if lyr.name() == "Vulnerability Map": 
                 QgsMapLayerRegistry.instance().removeMapLayers( [lyr.id()] )
+
+        ############################# Si les tests sont satisfait lance la fonction
+        #recupere l'extension
+        for lyr in QgsMapLayerRegistry.instance().mapLayers().values():
+            if lyr.name() == "Extension": 
+                layer = QgsRasterLayer(lyr.source(),"extension")
+            else :
+                pass
                 
-        Carte_Finale.genere_carteFinale(self.dockwidget.spinBox_PondP.value(),self.dockwidget.spinBox_PondR.value(),self.dockwidget.spinBox_PondI.value(),self.dockwidget.spinBox_PondKa.value(),self.dockwidget.mMapLayerComboBox_CartePF.currentLayer(),self.dockwidget.mMapLayerComboBox_CarteRF.currentLayer(),self.dockwidget.mMapLayerComboBox_CarteIF.currentLayer(),self.dockwidget.mMapLayerComboBox_CarteKaF.currentLayer(),self.dockwidget.lineEdit_dossier_travail.text())
+        Carte_Finale.genere_carteFinale(self.dockwidget.spinBox_PondP.value(),
+                                        self.dockwidget.spinBox_PondR.value(),
+                                        self.dockwidget.spinBox_PondI.value(),
+                                        self.dockwidget.spinBox_PondKa.value(),
+                                        self.dockwidget.mMapLayerComboBox_CartePF.currentLayer(),
+                                        self.dockwidget.mMapLayerComboBox_CarteRF.currentLayer(),
+                                        self.dockwidget.mMapLayerComboBox_CarteIF.currentLayer(),
+                                        self.dockwidget.mMapLayerComboBox_CarteKaF.currentLayer(),
+                                        self.dockwidget.lineEdit_dossier_travail.text(),
+                                        layer)
+                                        
         #genere le style et charge le tif dans QGIS
         lay_carteFinale = QgsRasterLayer(str(self.dockwidget.lineEdit_dossier_travail.text())+'/Vulnerability_Map.tif','Vulnerability Map')
         s = QgsRasterShader()
