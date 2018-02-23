@@ -93,7 +93,7 @@ def genere_carteFinale(pP,pR,pI,pKa,Carte_P, Carte_R, Carte_I, Carte_Ka, doss):
     StrExtent = ','.join(Extent)
 
     #reclassement de la Carte Vg et affichage de la carte
-    if qgis.core.QGis.QGIS_VERSION_INT > 21800 :
+    if QGis.QGIS_VERSION_INT > 21800 :
         processing.runalg("grass7:r.reclass", str(doss)+'/Carte_Vg.tif', os.path.dirname(os.path.abspath(__file__))+ '/reclass_rules/reclass_rules_carteVg.txt',"", StrExtent, int(ExtentInfo[1]), str(doss)+'/rVulnerability_Map.tif')
     else:
         processing.runalg("grass7:r.reclass", str(doss)+'/Carte_Vg.tif', os.path.dirname(os.path.abspath(__file__))+ '/reclass_rules/reclass_rules_carteVg.txt', StrExtent, int(ExtentInfo[1]), str(doss)+'/rVulnerability_Map.tif')

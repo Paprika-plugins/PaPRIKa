@@ -30,7 +30,7 @@ def genere_carteI(doss, extension, dem, reclass_rules_pente,exokarst,field_exoka
     print(StrExtent)
 
     #reclassement de la pente
-    if qgis.core.QGis.QGIS_VERSION_INT > 21800:
+    if QGis.QGIS_VERSION_INT > 21800:
         processing.runalg("grass7:r.reclass", rPente, reclass_rules_pente,"", StrExtent, ExtentInfo[1], str(doss)+'/Slope.tif')
     else :
         processing.runalg("grass7:r.reclass", rPente, reclass_rules_pente, StrExtent, ExtentInfo[1], str(doss)+'/Slope.tif')
@@ -56,13 +56,8 @@ def genere_carteI(doss, extension, dem, reclass_rules_pente,exokarst,field_exoka
                 valExokarst = 0
             else:
                 valExokarst = pExokarst.identify(pos, QgsRaster.IdentifyFormatValue).results()[1]
-            if valSlope <= valExokarst: 
-                 if valExokarst is None or valSlope is None:
-                    ValCarteI[j,i] = 0
-                 else:
-                    ValCarteI[j,i] = valExokarst
-            else:
-                ValCarteI[j,i] = valSlope
+                
+            ValCarteI[j,i] = max([valSlope, valExokarst]) if (valSlope,valExokarst) != (None,None) else 0 
 
     #recuperation du systeme de coordonnees
     source = gdal.Open(extension.source())
