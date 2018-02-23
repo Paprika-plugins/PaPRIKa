@@ -183,7 +183,7 @@ class Paprika:
         icon_path = ':/plugins/Paprika/icon.png'
         self.add_action(
             icon_path,
-            text=self.tr(u'Paprika'),
+            text=self.tr(u'Paprika Toolbox'),
             callback=self.run,
             parent=self.iface.mainWindow())
             
