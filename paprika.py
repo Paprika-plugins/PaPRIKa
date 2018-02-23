@@ -238,16 +238,16 @@ class Paprika:
                 self.dockwidget = Ui_PaprikaDockWidgetBase()
             
             #connection des boutons
-            QtCore.QObject.connect(self.dockwidget.pushButton_Aide, QtCore.SIGNAL("clicked ()"), self.open_help)
-            QtCore.QObject.connect(self.dockwidget.pushButton_methodo, QtCore.SIGNAL("clicked ()"), self.download_methodo)
-            QtCore.QObject.connect(self.dockwidget.pushButton_genere_guide, QtCore.SIGNAL("clicked ()"), self.lancer_genere_guide)
-            QtCore.QObject.connect(self.dockwidget.pushButton_lancerCarteP, QtCore.SIGNAL("clicked ()"), self.lancer_carteP)
-            QtCore.QObject.connect(self.dockwidget.pushButton_lancerCarteR, QtCore.SIGNAL("clicked ()"), self.lancer_carteR)
-            QtCore.QObject.connect(self.dockwidget.pushButton_lancerCarteI, QtCore.SIGNAL("clicked ()"), self.lancer_carteI)
-            QtCore.QObject.connect(self.dockwidget.pushButton_lancerCarteKa, QtCore.SIGNAL("clicked ()"), self.lancer_carteKa)
-            QtCore.QObject.connect(self.dockwidget.pushButton_lancerCarteFinale, QtCore.SIGNAL("clicked ()"), self.lancer_carteFinale)
-            QtCore.QObject.connect(self.dockwidget.toolButton_dossier_travail, QtCore.SIGNAL("clicked ()"), self.open_directory)
-            QtCore.QObject.connect(self.dockwidget.pushButton_Apropos, QtCore.SIGNAL("clicked ()"),self.open_Apropos)        
+            self.dockwidget.pushButton_Aide.clicked.connect(self.open_help)
+            self.dockwidget.pushButton_methodo.clicked.connect(self.download_methodo)
+            self.dockwidget.pushButton_genere_guide.clicked.connect(self.lancer_genere_guide)
+            self.dockwidget.pushButton_lancerCarteP.clicked.connect(self.lancer_carteP)
+            self.dockwidget.pushButton_lancerCarteR.clicked.connect(self.lancer_carteR)
+            self.dockwidget.pushButton_lancerCarteI.clicked.connect(self.lancer_carteI)
+            self.dockwidget.pushButton_lancerCarteKa.clicked.connect(self.lancer_carteKa)
+            self.dockwidget.pushButton_lancerCarteFinale.clicked.connect(self.lancer_carteFinale)
+            self.dockwidget.toolButton_dossier_travail.clicked.connect(self.open_directory)
+            self.dockwidget.pushButton_Apropos.clicked.connect(self.open_Apropos)        
 
             # connect to provide cleanup on closing of dockwidget
             self.dockwidget.closingPlugin.connect(self.onClosePlugin)
