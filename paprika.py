@@ -462,16 +462,15 @@ class Paprika:
             if lyr.name() == "P factor": 
                 QgsMapLayerRegistry.instance().removeMapLayers( [lyr.id()] )
                 
-        Carte_P.genere_carteP(
-            layer,
-            self.dockwidget.lineEdit_dossier_travail.text(),
-            self.dockwidget.mMapLayerComboBox_ZNS.currentLayer(),
-            sol,
-            field_sol,
-            epikarst,
-            field_epikarst,
-            sinking,
-            field_sinking)
+        Carte_P.genere_carteP(layer,
+                            self.dockwidget.lineEdit_dossier_travail.text(),
+                            self.dockwidget.mMapLayerComboBox_ZNS.currentLayer(),
+                            sol,
+                            field_sol,
+                            epikarst,
+                            field_epikarst,
+                            sinking,
+                            field_sinking)
             
         #genere le style et charge le tif dans QGIS avec un message
         lay_carteP = QgsRasterLayer(str(self.dockwidget.lineEdit_dossier_travail.text())+'/P_factor.tif','P factor')
@@ -532,12 +531,11 @@ class Paprika:
             if lyr.name() == "R factor": 
                 QgsMapLayerRegistry.instance().removeMapLayers( [lyr.id()] )
                 
-        Carte_R.genere_carteR(
-            self.dockwidget.lineEdit_dossier_travail.text(),
-            layer,
-            lithology,
-            field_lithology,
-            structure)
+        Carte_R.genere_carteR(self.dockwidget.lineEdit_dossier_travail.text(),
+                                layer,
+                                lithology,
+                                field_lithology,
+                                structure)
         
         #genere le style et charge le tif dans QGIS
         lay_carteR = QgsRasterLayer(str(self.dockwidget.lineEdit_dossier_travail.text())+'/R_factor.tif','R factor')
@@ -600,13 +598,12 @@ class Paprika:
             if lyr.name() == "I Factor": 
                 QgsMapLayerRegistry.instance().removeMapLayers( [lyr.id()] )
                 
-        Carte_I.genere_carteI(
-            self.dockwidget.lineEdit_dossier_travail.text(),
-            layer,
-            pente,
-            os.path.dirname(os.path.abspath(__file__))+'/reclass_rules/reclass_rules_slope.txt',
-            exokarst,
-            field_exokarst)
+        Carte_I.genere_carteI(self.dockwidget.lineEdit_dossier_travail.text(),
+                                layer,
+                                pente,
+                                os.path.dirname(os.path.abspath(__file__))+'/reclass_rules/reclass_rules_slope.txt',
+                                exokarst,
+                                field_exokarst)
             
         #genere le style et charge le tif dans QGIS
         lay_carteI = QgsRasterLayer(str(self.dockwidget.lineEdit_dossier_travail.text())+'/I_factor.tif','I factor')
@@ -650,12 +647,13 @@ class Paprika:
         #genere le tif
         for lyr in QgsMapLayerRegistry.instance().mapLayers().values():
             if lyr.name() == "Ka factor": 
-                QgsMapLayerRegistry.instance().removeMapLayers( [lyr.id()] )
-        Carte_Ka.genere_carteKa(
-            int(self.dockwidget.comboBox_MANGIN.currentText()),
-            karst_features,
-            layer, 
-            self.dockwidget.lineEdit_dossier_travail.text())
+                QgsMapLayerRegistry.instance().removeMapLayers([lyr.id()])
+                
+        Carte_Ka.genere_carteKa(int(self.dockwidget.comboBox_MANGIN.currentText()),
+                                karst_features,
+                                layer, 
+                                self.dockwidget.lineEdit_dossier_travail.text())
+                                
         #genere le style et charge le tif dans QGIS
         lay_carteKa = QgsRasterLayer(str(self.dockwidget.lineEdit_dossier_travail.text())+'/Ka_factor.tif','Ka factor')
         s = QgsRasterShader()
@@ -764,7 +762,3 @@ class Paprika:
         reclass_rules.write(str(second) + ' thru ' + str(third) + '= 2\n')
         reclass_rules.write(str(third) + ' thru 9999999' + '= 1')
         reclass_rules.close()
-    
-    def update_log(self, message):
-        '''ajout des messages a l'utilisateur dans une fenetre de log'''
-        #to do

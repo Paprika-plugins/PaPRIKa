@@ -8,7 +8,7 @@
 
 [general]
 name= PaPRIKa Toolbox
-qgisMinimumVersion= 2.18.0
+qgisMinimumVersion= 2.14.0
 description= Vulnerability mapping of Karst aquifers
 version=1.1
 
@@ -42,4 +42,4 @@ deprecated=False
 
 #Author contact Infomation
 author=Chloe Ollivier (UMR EMMAH) - Konstantinos Chalikakis (UMR EMMAH) - Yoann Lecomte (SIG)
-email= chloe.ollivier@alumni.univ-avignon.fr
+email= paprika-plugin@univ-avignon.fr
