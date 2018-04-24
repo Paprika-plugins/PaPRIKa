@@ -10,6 +10,16 @@ Welcome to Paprika's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   introduction
+   start
+   impluvium
+   carteP
+   carteR
+   carteI
+   carteKa
+   finalMap
+   
+
 
 
 Indices and tables
