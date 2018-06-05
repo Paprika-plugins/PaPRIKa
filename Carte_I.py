@@ -7,8 +7,8 @@ import os
 
 def genere_carteI(doss, extension, dem, reclass_rules_pente,exokarst,field_exokarst):
     #creation du raster Pente
-    processing.runalg("gdalogr:slope",dem,1,False,False,True,1,str(doss)+'/rPente.tif')
-    rPente = QgsRasterLayer(str(doss)+'/rPente.tif', "rPente")
+    processing.runalg("gdalogr:slope",dem,1,False,False,True,1,str(doss)+'/Pente.tif')
+    rPente = QgsRasterLayer(str(doss)+'/Pente.tif', "Pente")
     #creation du raster Exokarst si besoin
     if field_exokarst is None:
         rExokarst = None
