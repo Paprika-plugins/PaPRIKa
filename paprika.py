@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-'''
+"""
 /***************************************************************************
  Paprika
                                  A QGIS plugin
@@ -19,18 +19,17 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-'''
-from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, Qt
-from PyQt4.QtGui import QAction, QIcon, QFileDialog, QMessageBox
-from PyQt4 import QtGui, uic, QtCore
-# Initialize Qt resources from file resources.py
-import resources
+"""
+import os, sys
+sys.path.append(os.path.dirname(__file__))
+
+from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, Qt
+from PyQt5.QtWidgets import QAction,QMessageBox, QFileDialog, QDialog
+from PyQt5.QtGui import QIcon, QColor
 
 # Import the code for the DockWidget
-from A_propos import Ui_A_propos
-from paprika_dockwidget import Ui_PaprikaDockWidgetBase
-import os
-import sys
+from .A_propos import Ui_A_propos
+from .paprika_dockwidget import Ui_PaprikaDockWidgetBase
 from qgis.gui import *
 from qgis.core import *
 import webbrowser
@@ -43,17 +42,18 @@ import Carte_I
 import Carte_Ka
 import Carte_Finale
 
+
 class Paprika:
-    '''QGIS Plugin Implementation.'''
+    """QGIS Plugin Implementation."""
 
     def __init__(self, iface):
-        '''Constructor.
+        """Constructor.
 
         :param iface: An interface instance that will be passed to this class
             which provides the hook by which you can manipulate the QGIS
             application at run time.
         :type iface: QgsInterface
-        '''
+        """
         # Save reference to the QGIS interface
         self.iface = iface
 
@@ -77,19 +77,14 @@ class Paprika:
         # Declare instance attributes
         self.actions = []
         self.menu = self.tr(u'&Paprika')
-        # TODO: We are going to let the user set this up in a future iteration
         self.toolbar = self.iface.addToolBar(u'Paprika')
         self.toolbar.setObjectName(u'Paprika')
-
-        #print "** INITIALIZING Paprika"
-
         self.pluginIsActive = False
         self.dockwidget = None
 
-
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
-        '''Get the translation for a string using Qt translation API.
+        """Get the translation for a string using Qt translation API.
 
         We implement this ourselves since we do not inherit QObject.
 
@@ -98,10 +93,9 @@ class Paprika:
 
         :returns: Translated version of message.
         :rtype: QString
-        '''
+        """
         # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
         return QCoreApplication.translate('Paprika', message)
-
 
     def add_action(
         self,
@@ -114,7 +108,7 @@ class Paprika:
         status_tip=None,
         whats_this=None,
         parent=None):
-        '''Add a toolbar icon to the toolbar.
+        """Add a toolbar icon to the toolbar.
 
         :param icon_path: Path to the icon for this action. Can be a resource
             path (e.g. ':/plugins/foo/bar.png') or a normal file system path.
@@ -151,7 +145,7 @@ class Paprika:
         :returns: The action that was created. Note that the action is also
             added to self.actions list.
         :rtype: QAction
-        '''
+        """
 
         icon = QIcon(icon_path)
         action = QAction(icon, text, parent)
@@ -176,68 +170,38 @@ class Paprika:
 
         return action
 
-
     def initGui(self):
-        '''Create the menu entries and toolbar icons inside the QGIS GUI.'''
+        """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
-        icon_path = ':/plugins/Paprika/icon.png'
+        icon_path = '/home/yoann/.local/share/QGIS/QGIS3/profiles/default/python/plugins/PaPRIKa/icon.png'
         self.add_action(
             icon_path,
             text=self.tr(u'Paprika Toolbox'),
             callback=self.run,
             parent=self.iface.mainWindow())
-            
-
-    #--------------------------------------------------------------------------
 
     def onClosePlugin(self):
-        '''Cleanup necessary items here when plugin dockwidget is closed'''
-
-        #print "** CLOSING Paprika"
-
-        # disconnects
+        """Cleanup necessary items here when plugin dockwidget is closed"""
         self.dockwidget.closingPlugin.disconnect(self.onClosePlugin)
-
-        # remove this statement if dockwidget is to remain
-        # for reuse if plugin is reopened
-        # Commented next statement since it causes QGIS crashe
-        # when closing the docked window:
-        # self.dockwidget = None
-
         self.pluginIsActive = False
 
-
     def unload(self):
-        '''Removes the plugin menu item and icon from QGIS GUI.'''
-
-        #print "** UNLOAD Paprika"
-
+        """Removes the plugin menu item and icon from QGIS GUI."""
         for action in self.actions:
             self.iface.removePluginMenu(
                 self.tr(u'&Paprika'),
                 action)
             self.iface.removeToolBarIcon(action)
-        # remove the toolbar
         del self.toolbar
 
-    #--------------------------------------------------------------------------
     def run(self):
-        '''Run method that loads and starts the plugin'''
-        
-            
+        """Run method that loads and starts the plugin"""
         if not self.pluginIsActive:
             self.pluginIsActive = True
 
-            #print "** STARTING Paprika"
-
-            # dockwidget may not exist if:
-            #    first run of plugin
-            #    removed on close (see self.onClosePlugin method)
-            if self.dockwidget == None:
-                # Create the dockwidget (after translation) and keep reference
+            if self.dockwidget is None:
                 self.dockwidget = Ui_PaprikaDockWidgetBase()
-            
-            #connection des boutons
+
             self.dockwidget.pushButton_Aide.clicked.connect(self.open_help)
             self.dockwidget.pushButton_methodo.clicked.connect(self.download_methodo)
             self.dockwidget.pushButton_genere_guide.clicked.connect(self.lancer_genere_guide)
@@ -252,8 +216,6 @@ class Paprika:
             # connect to provide cleanup on closing of dockwidget
             self.dockwidget.closingPlugin.connect(self.onClosePlugin)
 
-            # show the dockwidget
-            # TODO: fix to allow choice of dock location
             self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dockwidget)
             self.dockwidget.show()
             
@@ -382,63 +344,67 @@ class Paprika:
     
     # fonction des push button 
     def open_directory(self):
-        '''permet a l'utilisateur de choisir son repertoire de travail'''
-        directory = QtGui.QFileDialog.getExistingDirectory(self.dockwidget.toolButton_dossier_travail,"Sélectionner le répertoire de travail", QgsProject.instance().fileName(), QtGui.QFileDialog.ShowDirsOnly)
+        """permet a l'utilisateur de choisir son repertoire de travail"""
+        directory = QFileDialog.getExistingDirectory(self.dockwidget.toolButton_dossier_travail,
+                                                     "Sélectionner le répertoire de travail",
+                                                     QgsProject.instance().fileName(),
+                                                     QFileDialog.ShowDirsOnly)
         self.dockwidget.lineEdit_dossier_travail.setText(str(QtCore.QDir.toNativeSeparators(directory)))
     
     def lancer_genere_guide(self):
-        '''lance la fonction de generation du guide''' 
-        if os.path.exists(self.dockwidget.lineEdit_dossier_travail.text())== False :
-            return self.showdialog('Please check if the directory of generating is filled', 'Directory missing in the system...')
-        for lyr in QgsMapLayerRegistry.instance().mapLayers().values():
+        """lance la fonction de generation du guide""" 
+        if not os.path.exists(self.dockwidget.lineEdit_dossier_travail.text()):
+            return self.showdialog('Please check if the directory of generating is filled',
+                                   'Directory missing in the system...')
+        for lyr in QgsProject.instance().mapLayers().values():
             if lyr.name() == "Extension": 
-                QgsMapLayerRegistry.instance().removeMapLayers( [lyr.id()] )
-        raster_extension.genere_guide(self.dockwidget.mMapLayerComboBox_IMPLUVIUM.currentLayer(), self.dockwidget.spinBox_Resolution.value(),self.dockwidget.lineEdit_dossier_travail.text() )
+                QgsProject.instance().removeMapLayers([lyr.id()])
+        raster_extension.genere_guide(self.dockwidget.mMapLayerComboBox_IMPLUVIUM.currentLayer(),
+                                      self.dockwidget.spinBox_Resolution.value(),
+                                      self.dockwidget.lineEdit_dossier_travail.text())
         self.iface.addRasterLayer(str(self.dockwidget.lineEdit_dossier_travail.text())+'/Extension.tif','Extension')        
     
     def lancer_carteP(self):
-        '''test les parametres et lance la generation de la carte P'''
+        """test les parametres et lance la generation de la carte P"""
     # test pour ne pas lancer la fonction sans que la verification soit correcte
-            #verifie que l'extension existe
-        if os.path.exists(self.dockwidget.lineEdit_dossier_travail.text() + '/Extension.tif')== False :
-             return self.showdialog('Please check if the directory of generating is filled and that the guide is already generate...', 'Layer Extension missing in the system...')
+            # verifie que l'extension existe
+        if not os.path.exists(self.dockwidget.lineEdit_dossier_travail.text() + '/Extension.tif'):
+            return self.showdialog('Please check if the directory of generating is filled and that the guide \
+                                        is already generate...',
+                                    'Layer Extension missing in the system...')
             
-        #controle que la comboBox du champ SOL est bien remplie
+        # controle que la comboBox du champ SOL est bien remplie
         if self.dockwidget.mFieldComboBox_SOL.currentField() == u'':
             return self.showdialog('The index Field of Soil Protection Layer is not set...', 'Field issue...')
-        #controle la validite des occurences du champ index
+        # controle la validite des occurences du champ index
         value_sol = [feature.attribute(self.dockwidget.mFieldComboBox_SOL.currentField()) for feature in self.dockwidget.mMapLayerComboBox_SOL.currentLayer().getFeatures()]
         if min(value_sol) < 0 or max(value_sol) > 4 or len(value_sol) == 0 :
             return self.showdialog('The index Field of Soil Cover Layer has wrong value... (not between 0 and 4 or null)', 'Index issue...')
 
         if self.dockwidget.checkBox_Epikarst.isChecked():
-            #controle que la comboBox du champ Epikarst est bien remplie
+            # controle que la comboBox du champ Epikarst est bien remplie
             if self.dockwidget.mFieldComboBox_EPIKARST.currentField() == u'':
                 return self.showdialog('The index Field of Epikarst Layer is not set...', 'Field issue...')
-            #controle la validite des occurences du champ index
+            # controle la validite des occurences du champ index
             value_epikarst = [feature.attribute(self.dockwidget.mFieldComboBox_EPIKARST.currentField()) for feature in self.dockwidget.mMapLayerComboBox_EPIKARST.currentLayer().getFeatures()]
             if min(value_epikarst) < 0 or max(value_epikarst) > 4 or len(value_epikarst) == 0 :
                 return self.showdialog('The index Field of Epikarst Layer has wrong value... (not between 0 and 4 or null)', 'Index issue...')
 
         if self.dockwidget.checkBox_Sinking.isChecked():
-            #controle que la comboBox du champ Sinking Stream Catchment est bien remplie
+            # controle que la comboBox du champ Sinking Stream Catchment est bien remplie
             if self.dockwidget.mFieldComboBox_SINKING_CATCHMENT.currentField() == u'':
                 return self.showdialog('The index Field of Sinking Stream Catchment Layer is not set...', 'Field issue...')
-            #controle la validite des occurences des champs index
+            # controle la validite des occurences des champs index
             value_sinking = [feature.attribute(self.dockwidget.mFieldComboBox_SINKING_CATCHMENT.currentField()) for feature in self.dockwidget.mMapLayerComboBox_SINKING_CATCHMENT.currentLayer().getFeatures()]
             if min(value_sinking) < 0 or max(value_sinking) > 4 or len(value_sinking) == 0 :
                 return self.showdialog('The index''s field of Sinking catchment Layer has wrong value... (not between 0 and 4 or null)', 'Index issue...')
-        
-    ################################ si les test sont satisfait, lance la fonction    
-        #recupere l'extension
-        for lyr in QgsMapLayerRegistry.instance().mapLayers().values():
+
+        for lyr in QgsProject.instance().mapLayers().values():
             if lyr.name() == "Extension": 
                 layer = QgsRasterLayer(lyr.source(),"extension")
             else :
                 pass
                 
-        #genere les parametres a passer
-            #SOL
         sol = self.dockwidget.mMapLayerComboBox_SOL.currentLayer()
         field_sol = self.dockwidget.mFieldComboBox_SOL.currentField()
             #EPIKARST
@@ -458,9 +424,9 @@ class Paprika:
             field_sinking = None 
         
         #lance la generation de la carte P
-        for lyr in QgsMapLayerRegistry.instance().mapLayers().values():
+        for lyr in QgsProject.instance().mapLayers().values():
             if lyr.name() == "P factor": 
-                QgsMapLayerRegistry.instance().removeMapLayers( [lyr.id()] )
+                QgsProject.instance().removeMapLayers( [lyr.id()] )
                 
         Carte_P.genere_carteP(layer,
                             self.dockwidget.lineEdit_dossier_travail.text(),
@@ -478,21 +444,21 @@ class Paprika:
         c = QgsColorRampShader()
         c.setColorRampType(QgsColorRampShader.EXACT)
         i = []
-        i.append(QgsColorRampShader.ColorRampItem(0, QtGui.QColor('#FFFFFF'), '0'))
-        i.append(QgsColorRampShader.ColorRampItem(1, QtGui.QColor('#0040FF'), '1'))
-        i.append(QgsColorRampShader.ColorRampItem(2, QtGui.QColor('#A8D990'), '2'))
-        i.append(QgsColorRampShader.ColorRampItem(3, QtGui.QColor('#F6F085'), '3'))
-        i.append(QgsColorRampShader.ColorRampItem(4, QtGui.QColor('#E6A55B'), '4'))
-        i.append(QgsColorRampShader.ColorRampItem(5, QtGui.QColor('#A43C27'), '5'))
+        i.append(QgsColorRampShader.ColorRampItem(0, QColor('#FFFFFF'), '0'))
+        i.append(QgsColorRampShader.ColorRampItem(1, QColor('#0040FF'), '1'))
+        i.append(QgsColorRampShader.ColorRampItem(2, QColor('#A8D990'), '2'))
+        i.append(QgsColorRampShader.ColorRampItem(3, QColor('#F6F085'), '3'))
+        i.append(QgsColorRampShader.ColorRampItem(4, QColor('#E6A55B'), '4'))
+        i.append(QgsColorRampShader.ColorRampItem(5, QColor('#A43C27'), '5'))
         c.setColorRampItemList(i)
         s.setRasterShaderFunction(c)
         ps = QgsSingleBandPseudoColorRenderer(lay_carteP.dataProvider(), 1, s)
         lay_carteP.setRenderer(ps)
-        QgsMapLayerRegistry.instance().addMapLayer(lay_carteP)
+        QgsProject.instance().addMapLayer(lay_carteP)
         self.showdialog('P factor map created wih success!', 'Well done!')
         
     def lancer_carteR(self):
-        '''teste les parametres et lance la generation de la carte R'''
+        """teste les parametres et lance la generation de la carte R"""
         
         ############################# test pour ne pas lancer la fonction sans que la verification soit correcte
             #verifie que l'extension existe
@@ -521,15 +487,15 @@ class Paprika:
         
         #lance la generation de la carte R
             #recupere l'extension
-        for lyr in QgsMapLayerRegistry.instance().mapLayers().values():
+        for lyr in QgsProject.instance().mapLayers().values():
             if lyr.name() == "Extension": 
                 layer = QgsRasterLayer(lyr.source(),"extension")
             else :
                 pass
         #lance la generation la carte R
-        for lyr in QgsMapLayerRegistry.instance().mapLayers().values():
+        for lyr in QgsProject.instance().mapLayers().values():
             if lyr.name() == "R factor": 
-                QgsMapLayerRegistry.instance().removeMapLayers( [lyr.id()] )
+                QgsProject.instance().removeMapLayers( [lyr.id()] )
                 
         Carte_R.genere_carteR(self.dockwidget.lineEdit_dossier_travail.text(),
                                 layer,
@@ -543,20 +509,20 @@ class Paprika:
         c = QgsColorRampShader()
         c.setColorRampType(QgsColorRampShader.EXACT)
         i = []
-        i.append(QgsColorRampShader.ColorRampItem(0, QtGui.QColor('#FFFFFF'), '0'))
-        i.append(QgsColorRampShader.ColorRampItem(1, QtGui.QColor('#A8D990'), '1'))
-        i.append(QgsColorRampShader.ColorRampItem(2, QtGui.QColor('#F6F085'), '2'))
-        i.append(QgsColorRampShader.ColorRampItem(3, QtGui.QColor('#E6A55B'), '3'))
-        i.append(QgsColorRampShader.ColorRampItem(4, QtGui.QColor('#A43C27'), '4'))
+        i.append(QgsColorRampShader.ColorRampItem(0, QColor('#FFFFFF'), '0'))
+        i.append(QgsColorRampShader.ColorRampItem(1, QColor('#A8D990'), '1'))
+        i.append(QgsColorRampShader.ColorRampItem(2, QColor('#F6F085'), '2'))
+        i.append(QgsColorRampShader.ColorRampItem(3, QColor('#E6A55B'), '3'))
+        i.append(QgsColorRampShader.ColorRampItem(4, QColor('#A43C27'), '4'))
         c.setColorRampItemList(i)
         s.setRasterShaderFunction(c)
         ps = QgsSingleBandPseudoColorRenderer(lay_carteR.dataProvider(), 1, s)
         lay_carteR.setRenderer(ps)
-        QgsMapLayerRegistry.instance().addMapLayer(lay_carteR)
+        QgsProject.instance().addMapLayer(lay_carteR)
         self.showdialog('R factor map created wih success!', 'Well done!')
             
     def lancer_carteI(self):
-        '''teste les parametres et lance la generation de la carte I'''
+        """teste les parametres et lance la generation de la carte I"""
         ########################## test pour ne pas lancer la fonction sans que la verification soit correcte
             #verifie que l'extension exist
         if os.path.exists(self.dockwidget.lineEdit_dossier_travail.text() + '/Extension.tif')== False :
@@ -577,7 +543,7 @@ class Paprika:
             #genere les regles de reclassement selon les parametres donnes par l'utilisateur
         self.generate_reclass_rules_slope(self.dockwidget.spinBox_first_threshold.value(),self.dockwidget.spinBox_second_threshold.value(),self.dockwidget.spinBox_third_threshold.value())
             #recupere l'extension
-        for lyr in QgsMapLayerRegistry.instance().mapLayers().values():
+        for lyr in QgsProject.instance().mapLayers().values():
             if lyr.name() == "Extension": 
                 layer = QgsRasterLayer(lyr.source(),"extension")
             else :
@@ -594,9 +560,9 @@ class Paprika:
             field_exokarst = None
         
         #lance la generation de la carte I
-        for lyr in QgsMapLayerRegistry.instance().mapLayers().values():
+        for lyr in QgsProject.instance().mapLayers().values():
             if lyr.name() == "I Factor": 
-                QgsMapLayerRegistry.instance().removeMapLayers( [lyr.id()] )
+                QgsProject.instance().removeMapLayers( [lyr.id()] )
                 
         Carte_I.genere_carteI(self.dockwidget.lineEdit_dossier_travail.text(),
                                 layer,
@@ -611,20 +577,20 @@ class Paprika:
         c = QgsColorRampShader()
         c.setColorRampType(QgsColorRampShader.EXACT)
         i = []
-        i.append(QgsColorRampShader.ColorRampItem(0, QtGui.QColor('#FFFFFF'), '0'))
-        i.append(QgsColorRampShader.ColorRampItem(1, QtGui.QColor('#A8D990'), '1'))
-        i.append(QgsColorRampShader.ColorRampItem(2, QtGui.QColor('#F6F085'), '2'))
-        i.append(QgsColorRampShader.ColorRampItem(3, QtGui.QColor('#E6A55B'), '3'))
-        i.append(QgsColorRampShader.ColorRampItem(4, QtGui.QColor('#A43C27'), '4'))
+        i.append(QgsColorRampShader.ColorRampItem(0, QColor('#FFFFFF'), '0'))
+        i.append(QgsColorRampShader.ColorRampItem(1, QColor('#A8D990'), '1'))
+        i.append(QgsColorRampShader.ColorRampItem(2, QColor('#F6F085'), '2'))
+        i.append(QgsColorRampShader.ColorRampItem(3, QColor('#E6A55B'), '3'))
+        i.append(QgsColorRampShader.ColorRampItem(4, QColor('#A43C27'), '4'))
         c.setColorRampItemList(i)
         s.setRasterShaderFunction(c)
         ps = QgsSingleBandPseudoColorRenderer(lay_carteI.dataProvider(), 1, s)
         lay_carteI.setRenderer(ps)
-        QgsMapLayerRegistry.instance().addMapLayer(lay_carteI)
+        QgsProject.instance().addMapLayer(lay_carteI)
         self.showdialog('I factor map created wih success!', 'Well done!')
         
     def lancer_carteKa(self):
-        '''teste les parametres et lance la generation de la carte Ka'''
+        """teste les parametres et lance la generation de la carte Ka"""
         ########################## test pour ne pas lancer la fonction sans que la verification soit correcte
             #verifie que l'extension exist
         if os.path.exists(self.dockwidget.lineEdit_dossier_travail.text() + '/Extension.tif')== False :
@@ -632,7 +598,7 @@ class Paprika:
                 
         ############################# Si les tests sont satisfait lance la fonction
         #recupere l'extension
-        for lyr in QgsMapLayerRegistry.instance().mapLayers().values():
+        for lyr in QgsProject.instance().mapLayers().values():
             if lyr.name() == "Extension": 
                 layer = QgsRasterLayer(lyr.source(),"extension")
             else :
@@ -645,9 +611,9 @@ class Paprika:
             karst_features = None
                 
         #genere le tif
-        for lyr in QgsMapLayerRegistry.instance().mapLayers().values():
+        for lyr in QgsProject.instance().mapLayers().values():
             if lyr.name() == "Ka factor": 
-                QgsMapLayerRegistry.instance().removeMapLayers([lyr.id()])
+                QgsProject.instance().removeMapLayers([lyr.id()])
                 
         Carte_Ka.genere_carteKa(int(self.dockwidget.comboBox_MANGIN.currentText()),
                                 karst_features,
@@ -660,20 +626,20 @@ class Paprika:
         c = QgsColorRampShader()
         c.setColorRampType(QgsColorRampShader.EXACT)
         i = []
-        i.append(QgsColorRampShader.ColorRampItem(0, QtGui.QColor('#FFFFFF'), '0'))
-        i.append(QgsColorRampShader.ColorRampItem(1, QtGui.QColor('#A8D990'), '1'))
-        i.append(QgsColorRampShader.ColorRampItem(2, QtGui.QColor('#F6F085'), '2'))
-        i.append(QgsColorRampShader.ColorRampItem(3, QtGui.QColor('#E6A55B'), '3'))
-        i.append(QgsColorRampShader.ColorRampItem(4, QtGui.QColor('#A43C27'), '4'))
+        i.append(QgsColorRampShader.ColorRampItem(0, QColor('#FFFFFF'), '0'))
+        i.append(QgsColorRampShader.ColorRampItem(1, QColor('#A8D990'), '1'))
+        i.append(QgsColorRampShader.ColorRampItem(2, QColor('#F6F085'), '2'))
+        i.append(QgsColorRampShader.ColorRampItem(3, QColor('#E6A55B'), '3'))
+        i.append(QgsColorRampShader.ColorRampItem(4, QColor('#A43C27'), '4'))
         c.setColorRampItemList(i)
         s.setRasterShaderFunction(c)
         ps = QgsSingleBandPseudoColorRenderer(lay_carteKa.dataProvider(), 1, s)
         lay_carteKa.setRenderer(ps)
-        QgsMapLayerRegistry.instance().addMapLayer(lay_carteKa)
+        QgsProject.instance().addMapLayer(lay_carteKa)
         self.showdialog('Ka factor map created wih success!', 'Well done!')
     
     def lancer_carteFinale(self):
-        '''fonction de generation, mise en forme et chargement de la carte finale'''
+        """fonction de generation, mise en forme et chargement de la carte finale"""
         if os.path.exists(self.dockwidget.lineEdit_dossier_travail.text())== False :
             return self.showdialog('Please check if the directory of generating is filled', 'Directory missing in the system...')
         #verifie la ponderation
@@ -685,13 +651,13 @@ class Paprika:
             return self.showdialog('weight sum must be egal at 100%!', 'invalid weight...')
             
         #supprime la couche si elle est deja chargee et genere le tif
-        for lyr in QgsMapLayerRegistry.instance().mapLayers().values():
+        for lyr in QgsProject.instance().mapLayers().values():
             if lyr.name() == "Vulnerability Map": 
-                QgsMapLayerRegistry.instance().removeMapLayers( [lyr.id()] )
+                QgsProject.instance().removeMapLayers( [lyr.id()] )
 
         ############################# Si les tests sont satisfait lance la fonction
         #recupere l'extension
-        for lyr in QgsMapLayerRegistry.instance().mapLayers().values():
+        for lyr in QgsProject.instance().mapLayers().values():
             if lyr.name() == "Extension": 
                 layer = QgsRasterLayer(lyr.source(),"extension")
             else :
@@ -714,20 +680,20 @@ class Paprika:
         c = QgsColorRampShader()
         c.setColorRampType(QgsColorRampShader.EXACT)
         i = []
-        i.append(QgsColorRampShader.ColorRampItem(0, QtGui.QColor('#FFFFFF'), '0'))
-        i.append(QgsColorRampShader.ColorRampItem(1, QtGui.QColor('#A8D990'), '1'))
-        i.append(QgsColorRampShader.ColorRampItem(2, QtGui.QColor('#F6F085'), '2'))
-        i.append(QgsColorRampShader.ColorRampItem(3, QtGui.QColor('#E6A55B'), '3'))
-        i.append(QgsColorRampShader.ColorRampItem(4, QtGui.QColor('#A43C27'), '4'))
+        i.append(QgsColorRampShader.ColorRampItem(0, QColor('#FFFFFF'), '0'))
+        i.append(QgsColorRampShader.ColorRampItem(1, QColor('#A8D990'), '1'))
+        i.append(QgsColorRampShader.ColorRampItem(2, QColor('#F6F085'), '2'))
+        i.append(QgsColorRampShader.ColorRampItem(3, QColor('#E6A55B'), '3'))
+        i.append(QgsColorRampShader.ColorRampItem(4, QColor('#A43C27'), '4'))
         c.setColorRampItemList(i)
         s.setRasterShaderFunction(c)
         ps = QgsSingleBandPseudoColorRenderer(lay_carteFinale.dataProvider(), 1, s)
         lay_carteFinale.setRenderer(ps)
-        QgsMapLayerRegistry.instance().addMapLayer(lay_carteFinale)
+        QgsProject.instance().addMapLayer(lay_carteFinale)
         return self.showdialog('Final map created wih success!', 'Well done!')
     
     def showdialog (self, text, title):
-        '''fonction permettant d'afficher des messages a l'utilisateur'''
+        """fonction permettant d'afficher des messages a l'utilisateur"""
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Warning)
         msg.setText(text)
@@ -736,26 +702,26 @@ class Paprika:
         msg.exec_()
     
     def open_Apropos(self):
-        '''fonction d'ouverture de la fenetre A propos, connectee a son PushButton'''
-        Dialog = QtGui.QDialog()
+        """fonction d'ouverture de la fenetre A propos, connectee a son PushButton"""
+        Dialog = QDialog()
         md = Ui_A_propos()
         md.setupUi(Dialog)
         Dialog.exec_()
     
     def download_methodo(self):
-        '''fonction d'ouverture de la methodologie officielle PaPRIKa'''
+        """fonction d'ouverture de la methodologie officielle PaPRIKa"""
         webbrowser.open_new('http://infoterre.brgm.fr/rapports/RP-57527-FR.pdf')
         webbrowser.open_new_tab('http://link.springer.com/article/10.1007/s10040-010-0688-8')
     
     def open_help(self):
-        '''fonction d'ouverture de la documentation du plugin'''
+        """fonction d'ouverture de la documentation du plugin"""
         if os.name == 'nt':
             os.startfile(os.path.dirname(os.path.abspath(__file__))+'/doc/Paprika_Toolbox_User_guide.pdf')
         elif os.name == 'posix':
             subprocess.call(["xdg-open", os.path.dirname(os.path.abspath(__file__))+'/doc/Paprika_Toolbox_User_guide.pdf'])
     
     def generate_reclass_rules_slope(self,first,second,third):
-        '''fonction de generation du fichier .txt des regles de reclassement de la pente, le fichier est genere dans le repertoire du plugin'''
+        """fonction de generation du fichier .txt des regles de reclassement de la pente, le fichier est genere dans le repertoire du plugin"""
         reclass_rules = open(os.path.dirname(os.path.abspath(__file__))+'/reclass_rules/reclass_rules_slope.txt', 'w')
         reclass_rules.write('0 thru ' + str(first) + '= 4\n')
         reclass_rules.write(str(first) + ' thru ' + str(second) + '= 3\n')

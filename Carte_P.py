@@ -17,22 +17,17 @@ def genere_carteP(extension, doss, ZNS,Sol, field_sol, Epikarst, field_epikarst,
 	Ymax = str(ExtentInfo[3] + ExtentInfo[5] * extension1.RasterYSize)
 	Extent = Xmin,Xmax,Ymax,Ymin
 	StrExtent = ','.join(Extent)
-	print ExtentInfo
-	print StrExtent
+
 	
 	#Rasterisation et ouverture de la couche sol
 	if Sol is None:
-		print 'Sol None'
 		pass
 	else :
 		copyfile(str(doss)+'/Extension.tif',str(doss)+'/rSol.tif')
 		processing.runalg("gdalogr:rasterize_over", Sol, field_sol, str(doss)+'/rSol.tif')
 		rSol = QgsRasterLayer(str(doss)+'/rSol.tif','rSol')
-		print 'rSol generate'
-
 	#Reechantillonage du raster ZNS
 	if ZNS is None:
-		print 'ZNS None'
 		pass
 		
 	else:
@@ -45,24 +40,19 @@ def genere_carteP(extension, doss, ZNS,Sol, field_sol, Epikarst, field_epikarst,
 		os.remove(str(doss)+'/ZNS.tif')
 		os.remove(str(doss)+'/ZNS.tfw')
 		rZNS = QgsRasterLayer(str(doss)+'/rZNS.tif','rZNS')
-		print 'rZNS generate'
 	
 	#Rasterisation et ouverture de la couche epikarst
 	if Epikarst is None:
-		print 'Epikarst none'
 		pass
 	else:
-		print Epikarst.name()
 		copyfile(str(doss)+'/Extension.tif',str(doss)+'/rEpikarst.tif')
 		processing.runalg("gdalogr:rasterize_over", Epikarst, field_epikarst, str(doss)+'/rEpikarst.tif')
 		rEpikarst = QgsRasterLayer(str(doss)+'/rEpikarst.tif','rEpikarst')
 	
 	#Rasterisation et ouverture de la couche Sinking Stream Catchment
 	if Sinking is None :
-		print 'Sinking none'
 		pass
 	else:
-		print Sinking.name()
 		copyfile(str(doss)+'/Extension.tif',str(doss)+'/rSinking.tif')
 		processing.runalg("gdalogr:rasterize_over", Sinking, field_sinking, str(doss)+'/rSinking.tif')
 		rSinking = QgsRasterLayer(str(doss)+'/rSinking.tif','rSinking')
@@ -76,17 +66,13 @@ def genere_carteP(extension, doss, ZNS,Sol, field_sol, Epikarst, field_epikarst,
 	else:
 		pEpikarst = rEpikarst.dataProvider()
 	if ZNS is None:
-		print 'ZNS is none'
 		pass
 	else:
 		pZNS = rZNS.dataProvider()
-		print 'pZNS OK'
 	if Sol is None:
-		print 'Sol is none'
 		pass
 	else:
 		pSol = rSol.dataProvider()
-		print 'pSol OK'
 	if Sinking is None:
 		pSinking = None
 	else:
@@ -122,13 +108,11 @@ def genere_carteP(extension, doss, ZNS,Sol, field_sol, Epikarst, field_epikarst,
 				valSinking = pSinking.identify(pos, QgsRaster.IdentifyFormatValue).results()[1]
 				if valSinking is None or valSinking == 0:
 					valSinking = 6
-			#print valSol, valZNS, valEpikarst,valSinking		
 			valeur.append(valSol)
 			valeur.append(valZNS)
 			valeur.append(valEpikarst)
 			valeur.append(valSinking)
 			ValCarteP[j,i] = min(valeur)
-			 
 
 	#recuperation du systeme de coordonnees
 	source = gdal.Open(extension.source())

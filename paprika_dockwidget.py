@@ -23,14 +23,15 @@
 
 import os
 
-from PyQt4 import QtGui, uic
-from PyQt4.QtCore import pyqtSignal
+from PyQt5.QtWidgets import QDockWidget
+from PyQt5.QtCore import pyqtSignal
+from PyQt5 import uic
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'paprika_dockwidget_base.ui'))
 
 
-class Ui_PaprikaDockWidgetBase(QtGui.QDockWidget, FORM_CLASS):
+class Ui_PaprikaDockWidgetBase(QDockWidget, FORM_CLASS):
 
     closingPlugin = pyqtSignal()
 

@@ -1,6 +1,6 @@
 import processing
 from qgis.core import *
-from PyQt4.QtCore import QVariant
+from PyQt5.QtCore import QVariant
 from shutil import copyfile
 import numpy
 from osgeo import gdal, ogr, osr

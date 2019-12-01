@@ -7,7 +7,7 @@
 #
 # WARNING! All changes made in this file will be lost!
 
-from PyQt4 import QtCore, QtGui
+from PyQt5 import QtCore, QtGui
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -199,4 +199,3 @@ class Ui_A_propos(object):
         self.groupBox_2.setTitle(_translate("A_propos", "Design by", None))
         self.label_4.setText(_translate("A_propos", "<a href=\"mailto:g.sindt@sig.eu.com?subject=Contact from Plugin Paprika\" style=\"color:#000000;text-decoration:none\">Savoie Informatique et Graphisme</a>", None))
 
-import resources
