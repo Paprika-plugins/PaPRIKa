@@ -21,7 +21,8 @@
  ***************************************************************************/
 """
 import os, sys
-sys.path.append(os.path.dirname(__file__))
+BASE_DIR = os.path.dirname(__file__)
+sys.path.append(BASE_DIR)
 
 from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, Qt
 from PyQt5.QtWidgets import QAction,QMessageBox, QFileDialog, QDialog
@@ -35,7 +36,6 @@ from qgis.core import *
 import webbrowser
 import subprocess
 
-import raster_extension
 import Carte_P
 import Carte_R
 import Carte_I
@@ -81,6 +81,7 @@ class Paprika:
         self.toolbar.setObjectName(u'Paprika')
         self.pluginIsActive = False
         self.dockwidget = None
+        self.raster_info = {}
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -173,7 +174,7 @@ class Paprika:
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
-        icon_path = '/home/yoann/.local/share/QGIS/QGIS3/profiles/default/python/plugins/PaPRIKa/icon.png'
+        icon_path = os.path.join(BASE_DIR, 'icon.png')
         self.add_action(
             icon_path,
             text=self.tr(u'Paprika Toolbox'),
@@ -204,7 +205,7 @@ class Paprika:
 
             self.dockwidget.pushButton_Aide.clicked.connect(self.open_help)
             self.dockwidget.pushButton_methodo.clicked.connect(self.download_methodo)
-            self.dockwidget.pushButton_genere_guide.clicked.connect(self.lancer_genere_guide)
+            self.dockwidget.pushButton_update_raster_info.clicked.connect(self.update_raster_info)
             self.dockwidget.pushButton_lancerCarteP.clicked.connect(self.lancer_carteP)
             self.dockwidget.pushButton_lancerCarteR.clicked.connect(self.lancer_carteR)
             self.dockwidget.pushButton_lancerCarteI.clicked.connect(self.lancer_carteI)
@@ -339,10 +340,7 @@ class Paprika:
             self.dockwidget.pushButton_lancerCarteFinale.setEnabled(True)
         else:
             self.dockwidget.pushButton_lancerCarteFinale.setEnabled(False)
-    
-    ########################################## FIN DE LA GESTION DE L'INTERFACE ########################################
-    
-    # fonction des push button 
+
     def open_directory(self):
         """permet a l'utilisateur de choisir son repertoire de travail"""
         directory = QFileDialog.getExistingDirectory(self.dockwidget.toolButton_dossier_travail,
@@ -351,29 +349,33 @@ class Paprika:
                                                      QFileDialog.ShowDirsOnly)
         self.dockwidget.lineEdit_dossier_travail.setText(str(QtCore.QDir.toNativeSeparators(directory)))
     
-    def lancer_genere_guide(self):
-        """lance la fonction de generation du guide""" 
-        if not os.path.exists(self.dockwidget.lineEdit_dossier_travail.text()):
-            return self.showdialog('Please check if the directory of generating is filled',
-                                   'Directory missing in the system...')
-        for lyr in QgsProject.instance().mapLayers().values():
-            if lyr.name() == "Extension": 
-                QgsProject.instance().removeMapLayers([lyr.id()])
-        raster_extension.genere_guide(self.dockwidget.mMapLayerComboBox_IMPLUVIUM.currentLayer(),
-                                      self.dockwidget.spinBox_Resolution.value(),
-                                      self.dockwidget.lineEdit_dossier_travail.text())
-        self.iface.addRasterLayer(str(self.dockwidget.lineEdit_dossier_travail.text())+'/Extension.tif','Extension')        
-    
+    def update_raster_info(self):
+        """stocke la taille et la resolution des rasters à générer"""
+        self.raster_info['resolution_x'] = self.dockwidget.spb_resolution.value()
+        self.raster_info['resolution_y'] = self.dockwidget.spb_resolution.value()
+        layer_impluvium = self.dockwidget.mMapLayerComboBox_IMPLUVIUM.currentLayer()
+        feature_impluvium = next(layer_impluvium.getFeatures())
+        geom = feature_impluvium.geometry().buffer(1000, 5).boundingBox()
+        Xmin = geom.xMinimum()
+        Ymin = geom.yMinimum()
+        Xmax = geom.xMaximum()
+        Ymax = geom.yMaximum()
+        self.raster_info['extent'] = {}
+        self.raster_info['extent']['Xmin'] = Xmin
+        self.raster_info['extent']['Ymin'] = Ymin
+        self.raster_info['extent']['Xmax'] = Xmax
+        self.raster_info['extent']['Ymax'] = Ymax
+        self.raster_info['extent']['str_extent'] = ', '.join([str(Xmin), str(Xmax), str(Ymax), str(Ymin)])
+        self.raster_info['size_x'] = int(abs(Xmax - Xmin)/self.raster_info['resolution_x'])
+        self.raster_info['size_y'] = int(abs(Ymax - Ymin)/self.raster_info['resolution_y'])
+        self.dockwidget.lbl_raster_info.setText(self.raster_info['extent']['str_extent'])
+
     def lancer_carteP(self):
         """test les parametres et lance la generation de la carte P"""
-    # test pour ne pas lancer la fonction sans que la verification soit correcte
-            # verifie que l'extension existe
-        if not os.path.exists(self.dockwidget.lineEdit_dossier_travail.text() + '/Extension.tif'):
-            return self.showdialog('Please check if the directory of generating is filled and that the guide \
-                                        is already generate...',
-                                    'Layer Extension missing in the system...')
+        if not self.raster_info:
+            return self.showdialog('Please fill the extent and resolution to use with the Update Extent button',
+                                   'Missing data')
             
-        # controle que la comboBox du champ SOL est bien remplie
         if self.dockwidget.mFieldComboBox_SOL.currentField() == u'':
             return self.showdialog('The index Field of Soil Protection Layer is not set...', 'Field issue...')
         # controle la validite des occurences du champ index
@@ -398,12 +400,6 @@ class Paprika:
             value_sinking = [feature.attribute(self.dockwidget.mFieldComboBox_SINKING_CATCHMENT.currentField()) for feature in self.dockwidget.mMapLayerComboBox_SINKING_CATCHMENT.currentLayer().getFeatures()]
             if min(value_sinking) < 0 or max(value_sinking) > 4 or len(value_sinking) == 0 :
                 return self.showdialog('The index''s field of Sinking catchment Layer has wrong value... (not between 0 and 4 or null)', 'Index issue...')
-
-        for lyr in QgsProject.instance().mapLayers().values():
-            if lyr.name() == "Extension": 
-                layer = QgsRasterLayer(lyr.source(),"extension")
-            else :
-                pass
                 
         sol = self.dockwidget.mMapLayerComboBox_SOL.currentLayer()
         field_sol = self.dockwidget.mFieldComboBox_SOL.currentField()
@@ -422,13 +418,13 @@ class Paprika:
         else : 
             sinking = None
             field_sinking = None 
-        
+        print(sol)
         #lance la generation de la carte P
         for lyr in QgsProject.instance().mapLayers().values():
             if lyr.name() == "P factor": 
                 QgsProject.instance().removeMapLayers( [lyr.id()] )
                 
-        Carte_P.genere_carteP(layer,
+        Carte_P.genere_carteP(self.raster_info,
                             self.dockwidget.lineEdit_dossier_travail.text(),
                             self.dockwidget.mMapLayerComboBox_ZNS.currentLayer(),
                             sol,
