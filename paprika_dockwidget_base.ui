@@ -14,7 +14,7 @@
    <string>PaPRIKa</string>
   </property>
   <widget class="QWidget" name="dockWidgetContents">
-   <layout class="QVBoxLayout" name="VerticalLayout" stretch="0,0,0,0,0,0,0">
+   <layout class="QVBoxLayout" name="VerticalLayout" stretch="0,0,0,0,0,0">
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_8">
       <item>
@@ -149,7 +149,7 @@
        <widget class="QLabel" name="label_Impluvium">
         <property name="maximumSize">
          <size>
-          <width>150</width>
+          <width>110</width>
           <height>16777215</height>
          </size>
         </property>
@@ -170,7 +170,7 @@
        <widget class="QgsMapLayerComboBox" name="mMapLayerComboBox_IMPLUVIUM">
         <property name="minimumSize">
          <size>
-          <width>150</width>
+          <width>100</width>
           <height>0</height>
          </size>
         </property>
@@ -227,54 +227,7 @@
         </property>
        </widget>
       </item>
-      <item>
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeType">
-         <enum>QSizePolicy::Fixed</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <widget class="QPushButton" name="pushButton_update_raster_info">
-        <property name="minimumSize">
-         <size>
-          <width>110</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>100</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>9</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>Update Extent</string>
-        </property>
-       </widget>
-      </item>
      </layout>
-    </item>
-    <item>
-     <widget class="QLabel" name="lbl_raster_info">
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
     </item>
     <item>
      <widget class="Line" name="line_2">
@@ -317,7 +270,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>4</number>
       </property>
       <property name="iconSize">
        <size>

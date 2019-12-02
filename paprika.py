@@ -82,6 +82,7 @@ class Paprika:
         self.pluginIsActive = False
         self.dockwidget = None
         self.raster_info = {}
+        self.extent_view = None
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -205,14 +206,13 @@ class Paprika:
 
             self.dockwidget.pushButton_Aide.clicked.connect(self.open_help)
             self.dockwidget.pushButton_methodo.clicked.connect(self.download_methodo)
-            self.dockwidget.pushButton_update_raster_info.clicked.connect(self.update_raster_info)
-            self.dockwidget.pushButton_lancerCarteP.clicked.connect(self.lancer_carteP)
-            self.dockwidget.pushButton_lancerCarteR.clicked.connect(self.lancer_carteR)
-            self.dockwidget.pushButton_lancerCarteI.clicked.connect(self.lancer_carteI)
-            self.dockwidget.pushButton_lancerCarteKa.clicked.connect(self.lancer_carteKa)
-            self.dockwidget.pushButton_lancerCarteFinale.clicked.connect(self.lancer_carteFinale)
+            self.dockwidget.pushButton_lancerCarteP.clicked.connect(self.carte_p)
+            self.dockwidget.pushButton_lancerCarteR.clicked.connect(self.carte_r)
+            self.dockwidget.pushButton_lancerCarteI.clicked.connect(self.carte_i)
+            self.dockwidget.pushButton_lancerCarteKa.clicked.connect(self.carte_ka)
+            self.dockwidget.pushButton_lancerCarteFinale.clicked.connect(self.carte_finale)
             self.dockwidget.toolButton_dossier_travail.clicked.connect(self.open_directory)
-            self.dockwidget.pushButton_Apropos.clicked.connect(self.open_Apropos)        
+            self.dockwidget.pushButton_Apropos.clicked.connect(self.open_a_propos)
 
             # connect to provide cleanup on closing of dockwidget
             self.dockwidget.closingPlugin.connect(self.onClosePlugin)
@@ -241,6 +241,7 @@ class Paprika:
             self.dockwidget.comboBox_MANGIN.addItems(['1','2','3','4']) 
         
             # peuplement des ComboBox des champs et gestion des criteres optionnels
+            self.dockwidget.mMapLayerComboBox_IMPLUVIUM.layerChanged.connect(self.update_raster_info)
                 #SOL
             self.dockwidget.mFieldComboBox_SOL.setFilters(QgsFieldProxyModel.Numeric)
             self.dockwidget.mFieldComboBox_SOL.setLayer(self.dockwidget.mMapLayerComboBox_SOL.currentLayer())
@@ -354,6 +355,7 @@ class Paprika:
         self.raster_info['resolution_x'] = self.dockwidget.spb_resolution.value()
         self.raster_info['resolution_y'] = self.dockwidget.spb_resolution.value()
         layer_impluvium = self.dockwidget.mMapLayerComboBox_IMPLUVIUM.currentLayer()
+        self.raster_info['projection_wkt'] = layer_impluvium.crs().toWkt()
         feature_impluvium = next(layer_impluvium.getFeatures())
         geom = feature_impluvium.geometry().buffer(1000, 5).boundingBox()
         Xmin = geom.xMinimum()
@@ -368,14 +370,16 @@ class Paprika:
         self.raster_info['extent']['str_extent'] = ', '.join([str(Xmin), str(Xmax), str(Ymax), str(Ymin)])
         self.raster_info['size_x'] = int(abs(Xmax - Xmin)/self.raster_info['resolution_x'])
         self.raster_info['size_y'] = int(abs(Ymax - Ymin)/self.raster_info['resolution_y'])
-        self.dockwidget.lbl_raster_info.setText(self.raster_info['extent']['str_extent'])
+        if self.extent_view is not None:
+            self.iface.mapCanvas().scene().removeItem(self.extent_view)
+            self.extent_view = None
+        else:
+            self.extent_view = QgsRubberBand(self.iface.mapCanvas())
+            self.extent_view.addGeometry(QgsGeometry.fromRect(QgsRectangle(Xmin, Ymin, Xmax, Ymax)))
+            self.extent_view.setColor(QColor('#A43C27'))
 
-    def lancer_carteP(self):
+    def carte_p(self):
         """test les parametres et lance la generation de la carte P"""
-        if not self.raster_info:
-            return self.showdialog('Please fill the extent and resolution to use with the Update Extent button',
-                                   'Missing data')
-            
         if self.dockwidget.mFieldComboBox_SOL.currentField() == u'':
             return self.showdialog('The index Field of Soil Protection Layer is not set...', 'Field issue...')
         # controle la validite des occurences du champ index
@@ -418,12 +422,18 @@ class Paprika:
         else : 
             sinking = None
             field_sinking = None 
-        print(sol)
+
         #lance la generation de la carte P
         for lyr in QgsProject.instance().mapLayers().values():
             if lyr.name() == "P factor": 
                 QgsProject.instance().removeMapLayers( [lyr.id()] )
-                
+        print((self.raster_info['extent']['Xmin'],
+     self.raster_info['resolution_x'],
+     0,
+     self.raster_info['extent']['Ymax'],
+     -self.raster_info['resolution_y'],
+     0,
+     ))
         Carte_P.genere_carteP(self.raster_info,
                             self.dockwidget.lineEdit_dossier_travail.text(),
                             self.dockwidget.mMapLayerComboBox_ZNS.currentLayer(),
@@ -436,126 +446,60 @@ class Paprika:
             
         #genere le style et charge le tif dans QGIS avec un message
         lay_carteP = QgsRasterLayer(str(self.dockwidget.lineEdit_dossier_travail.text())+'/P_factor.tif','P factor')
-        s = QgsRasterShader()
-        c = QgsColorRampShader()
-        c.setColorRampType(QgsColorRampShader.EXACT)
-        i = []
-        i.append(QgsColorRampShader.ColorRampItem(0, QColor('#FFFFFF'), '0'))
-        i.append(QgsColorRampShader.ColorRampItem(1, QColor('#0040FF'), '1'))
-        i.append(QgsColorRampShader.ColorRampItem(2, QColor('#A8D990'), '2'))
-        i.append(QgsColorRampShader.ColorRampItem(3, QColor('#F6F085'), '3'))
-        i.append(QgsColorRampShader.ColorRampItem(4, QColor('#E6A55B'), '4'))
-        i.append(QgsColorRampShader.ColorRampItem(5, QColor('#A43C27'), '5'))
-        c.setColorRampItemList(i)
-        s.setRasterShaderFunction(c)
-        ps = QgsSingleBandPseudoColorRenderer(lay_carteP.dataProvider(), 1, s)
-        lay_carteP.setRenderer(ps)
+        self.set_raster_style(lay_carteP)
         QgsProject.instance().addMapLayer(lay_carteP)
         self.showdialog('P factor map created wih success!', 'Well done!')
         
-    def lancer_carteR(self):
+    def carte_r(self):
         """teste les parametres et lance la generation de la carte R"""
-        
-        ############################# test pour ne pas lancer la fonction sans que la verification soit correcte
-            #verifie que l'extension existe
-        if os.path.exists(self.dockwidget.lineEdit_dossier_travail.text() + '/Extension.tif')== False :
-            return self.showdialog('Please check if the directory of generating is filled and that the guide is already generate...', 'Layer Extension missing in the system...')
-            
-                #LITHOLOGY
-        #controle que la comboBox du champ est bien remplie
         if self.dockwidget.mFieldComboBox_ROCHE.currentField() == u'':
                 return self.showdialog('The index Field of Lithology Layer is not set...', 'Field issue...')
-        #controle la validite des occurences du champ index        
         value_lithology = [feature.attribute(self.dockwidget.mFieldComboBox_ROCHE.currentField()) for feature in self.dockwidget.mMapLayerComboBox_ROCHE.currentLayer().getFeatures()]
         if min(value_lithology) < 0 or max(value_lithology) > 4 or len(value_lithology) == 0 :
             return self.showdialog('The index Field of Lithology Layer has wrong value... (not between 0 and 4 or null)', 'Index issue...')
-        
-        ################################ si les test sont satisfait, lance la fonction    
-        #genere les parametres a passer
-            #LITHOLOGY
+
         lithology = self.dockwidget.mMapLayerComboBox_ROCHE.currentLayer()
-        field_lithology = self.dockwidget.mFieldComboBox_ROCHE.currentField()        
-            #STRUCTURE
+        field_lithology = self.dockwidget.mFieldComboBox_ROCHE.currentField()
         if self.dockwidget.checkBox_STRUCTURE.isChecked():
             structure = self.dockwidget.mMapLayerComboBox_STRUCTURE.currentLayer()
         else:
             structure = None
-        
-        #lance la generation de la carte R
-            #recupere l'extension
-        for lyr in QgsProject.instance().mapLayers().values():
-            if lyr.name() == "Extension": 
-                layer = QgsRasterLayer(lyr.source(),"extension")
-            else :
-                pass
-        #lance la generation la carte R
+
         for lyr in QgsProject.instance().mapLayers().values():
             if lyr.name() == "R factor": 
                 QgsProject.instance().removeMapLayers( [lyr.id()] )
                 
         Carte_R.genere_carteR(self.dockwidget.lineEdit_dossier_travail.text(),
-                                layer,
+                                self.raster_info,
                                 lithology,
                                 field_lithology,
                                 structure)
-        
-        #genere le style et charge le tif dans QGIS
+
         lay_carteR = QgsRasterLayer(str(self.dockwidget.lineEdit_dossier_travail.text())+'/R_factor.tif','R factor')
-        s = QgsRasterShader()
-        c = QgsColorRampShader()
-        c.setColorRampType(QgsColorRampShader.EXACT)
-        i = []
-        i.append(QgsColorRampShader.ColorRampItem(0, QColor('#FFFFFF'), '0'))
-        i.append(QgsColorRampShader.ColorRampItem(1, QColor('#A8D990'), '1'))
-        i.append(QgsColorRampShader.ColorRampItem(2, QColor('#F6F085'), '2'))
-        i.append(QgsColorRampShader.ColorRampItem(3, QColor('#E6A55B'), '3'))
-        i.append(QgsColorRampShader.ColorRampItem(4, QColor('#A43C27'), '4'))
-        c.setColorRampItemList(i)
-        s.setRasterShaderFunction(c)
-        ps = QgsSingleBandPseudoColorRenderer(lay_carteR.dataProvider(), 1, s)
-        lay_carteR.setRenderer(ps)
+        self.set_raster_style(lay_carteR)
         QgsProject.instance().addMapLayer(lay_carteR)
         self.showdialog('R factor map created wih success!', 'Well done!')
             
-    def lancer_carteI(self):
+    def carte_i(self):
         """teste les parametres et lance la generation de la carte I"""
-        ########################## test pour ne pas lancer la fonction sans que la verification soit correcte
-            #verifie que l'extension exist
-        if os.path.exists(self.dockwidget.lineEdit_dossier_travail.text() + '/Extension.tif')== False :
-            return self.showdialog('Please check if the directory of generating is filled and that the guide is already generate...', 'Layer Extension missing in the system...')
-            
-                #OBJETS_EXOKARSTIQUES
         if self.dockwidget.checkBox_OBJETS_EXOKARSTIQUES.isChecked():
-            #controle que la comboBox du champ est bien remplie
             if self.dockwidget.mFieldComboBox_OBJETS_EXOKARSTIQUES.currentField() == u'':
                 return self.showdialog('The index Field of Karst features Layer is not set...', 'Field issue...')
-            #controle la validite des occurences des champs index
+
             value_objets_exokarstiques = [feature.attribute(self.dockwidget.mFieldComboBox_OBJETS_EXOKARSTIQUES.currentField()) for feature in self.dockwidget.mMapLayerComboBox_OBJETS_EXOKARSTIQUES.currentLayer().getFeatures()]
             if min(value_objets_exokarstiques) < 0 or max(value_objets_exokarstiques) > 4 :
                 return self.showdialog('The index Field of Karst features Layer has wrong value... (not between 0 and 4 or null)', 'Index issue...')
 
-
-        ######################## Si les tests sont satisfait lance la fonction
-            #genere les regles de reclassement selon les parametres donnes par l'utilisateur
         self.generate_reclass_rules_slope(self.dockwidget.spinBox_first_threshold.value(),self.dockwidget.spinBox_second_threshold.value(),self.dockwidget.spinBox_third_threshold.value())
-            #recupere l'extension
-        for lyr in QgsProject.instance().mapLayers().values():
-            if lyr.name() == "Extension": 
-                layer = QgsRasterLayer(lyr.source(),"extension")
-            else :
-                pass
-        #genere les parametres a passer
-            #PENTE
         pente = self.dockwidget.mMapLayerComboBox_PENTE.currentLayer()
-            #OBJETS_EXOKARSTIQUES
+
         if self.dockwidget.checkBox_OBJETS_EXOKARSTIQUES.isChecked():
             exokarst = self.dockwidget.mMapLayerComboBox_OBJETS_EXOKARSTIQUES.currentLayer()
             field_exokarst = self.dockwidget.mFieldComboBox_OBJETS_EXOKARSTIQUES.currentField()
         else:
             exokarst = None
             field_exokarst = None
-        
-        #lance la generation de la carte I
+
         for lyr in QgsProject.instance().mapLayers().values():
             if lyr.name() == "I Factor": 
                 QgsProject.instance().removeMapLayers( [lyr.id()] )
@@ -569,23 +513,11 @@ class Paprika:
             
         #genere le style et charge le tif dans QGIS
         lay_carteI = QgsRasterLayer(str(self.dockwidget.lineEdit_dossier_travail.text())+'/I_factor.tif','I factor')
-        s = QgsRasterShader()
-        c = QgsColorRampShader()
-        c.setColorRampType(QgsColorRampShader.EXACT)
-        i = []
-        i.append(QgsColorRampShader.ColorRampItem(0, QColor('#FFFFFF'), '0'))
-        i.append(QgsColorRampShader.ColorRampItem(1, QColor('#A8D990'), '1'))
-        i.append(QgsColorRampShader.ColorRampItem(2, QColor('#F6F085'), '2'))
-        i.append(QgsColorRampShader.ColorRampItem(3, QColor('#E6A55B'), '3'))
-        i.append(QgsColorRampShader.ColorRampItem(4, QColor('#A43C27'), '4'))
-        c.setColorRampItemList(i)
-        s.setRasterShaderFunction(c)
-        ps = QgsSingleBandPseudoColorRenderer(lay_carteI.dataProvider(), 1, s)
-        lay_carteI.setRenderer(ps)
+        self.set_raster_style(lay_carteI)
         QgsProject.instance().addMapLayer(lay_carteI)
         self.showdialog('I factor map created wih success!', 'Well done!')
         
-    def lancer_carteKa(self):
+    def carte_ka(self):
         """teste les parametres et lance la generation de la carte Ka"""
         ########################## test pour ne pas lancer la fonction sans que la verification soit correcte
             #verifie que l'extension exist
@@ -634,7 +566,7 @@ class Paprika:
         QgsProject.instance().addMapLayer(lay_carteKa)
         self.showdialog('Ka factor map created wih success!', 'Well done!')
     
-    def lancer_carteFinale(self):
+    def carte_finale(self):
         """fonction de generation, mise en forme et chargement de la carte finale"""
         if os.path.exists(self.dockwidget.lineEdit_dossier_travail.text())== False :
             return self.showdialog('Please check if the directory of generating is filled', 'Directory missing in the system...')
@@ -696,8 +628,24 @@ class Paprika:
         msg.setWindowTitle(title)
         msg.setStandardButtons(QMessageBox.Ok)
         msg.exec_()
+
+    def set_raster_style(self, raster_layer):
+        s = QgsRasterShader()
+        c = QgsColorRampShader()
+        c.setColorRampType(QgsColorRampShader.Exact)
+        i = []
+        i.append(QgsColorRampShader.ColorRampItem(0, QColor('#FFFFFF'), '0'))
+        i.append(QgsColorRampShader.ColorRampItem(1, QColor('#0040FF'), '1'))
+        i.append(QgsColorRampShader.ColorRampItem(2, QColor('#A8D990'), '2'))
+        i.append(QgsColorRampShader.ColorRampItem(3, QColor('#F6F085'), '3'))
+        i.append(QgsColorRampShader.ColorRampItem(4, QColor('#E6A55B'), '4'))
+        i.append(QgsColorRampShader.ColorRampItem(5, QColor('#A43C27'), '5'))
+        c.setColorRampItemList(i)
+        s.setRasterShaderFunction(c)
+        ps = QgsSingleBandPseudoColorRenderer(raster_layer.dataProvider(), 1, s)
+        raster_layer.setRenderer(ps)
     
-    def open_Apropos(self):
+    def open_a_propos(self):
         """fonction d'ouverture de la fenetre A propos, connectee a son PushButton"""
         Dialog = QDialog()
         md = Ui_A_propos()
