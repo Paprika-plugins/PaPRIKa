@@ -27,7 +27,7 @@ repository=https://github.com/Paprika-plugins/PaPRIKa
 changelog=
 	1.0 : first version of plugin on repository.
     1.1 : Bug fixes and upgrade to fit with 2.18
-    2.1 : Bring compatibility for QGIS3
+    2.1 : Bring compatibility for QGIS3 (old version still ok with QGIS2)
 
 # Tags are comma separated with spaces allowed
 tags= PaPRIKa, vector, raster, vulnerability, karst
@@ -42,5 +42,5 @@ experimental=False
 deprecated=False
 
 #Author contact Infomation
-author=Chloe Ollivier (UMR EMMAH) - Konstantinos Chalikakis (UMR EMMAH) - Yoann Lecomte (SIG)
+author=Chloe Ollivier (UMR EMMAH) - Konstantinos Chalikakis (UMR EMMAH) - Yoann Lecomte (CARTYL)
 email= paprika-plugin@univ-avignon.fr

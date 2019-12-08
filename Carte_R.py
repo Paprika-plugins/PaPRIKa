@@ -100,11 +100,3 @@ def genere_carteR (doss, raster_info, layer_lithology, field_lithology, layer_st
     rLithology = None
     rStructure = None
     Raster = None
-    
-    
-    
-    
-    
-    
-    
-    

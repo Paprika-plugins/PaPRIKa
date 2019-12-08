@@ -7,14 +7,14 @@
     <x>0</x>
     <y>0</y>
     <width>692</width>
-    <height>480</height>
+    <height>513</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>PaPRIKa</string>
   </property>
   <widget class="QWidget" name="dockWidgetContents">
-   <layout class="QVBoxLayout" name="VerticalLayout" stretch="0,0,0,0,0,0">
+   <layout class="QVBoxLayout" name="VerticalLayout" stretch="0,0,0,0,0,0,0,0">
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_8">
       <item>
@@ -270,7 +270,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>4</number>
+       <number>0</number>
       </property>
       <property name="iconSize">
        <size>
@@ -2092,6 +2092,20 @@
         </item>
        </layout>
       </widget>
+     </widget>
+    </item>
+    <item>
+     <widget class="QProgressBar" name="progress">
+      <property name="value">
+       <number>24</number>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLabel" name="lbl_progress">
+      <property name="text">
+       <string/>
+      </property>
      </widget>
     </item>
    </layout>

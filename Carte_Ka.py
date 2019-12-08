@@ -7,11 +7,8 @@ from osgeo import gdal, ogr, osr
 
 def genere_carteKa(Mangin, karst_features, extension, doss):
     if karst_features is not None:
-        #Rasterisation et ouverture de la couche karst features
-        copyfile(str(doss)+'/Extension.tif',str(doss)+'/rKarst_features.tif')
-        #Prepare karst_features datas
         karst_features.startEditing()
-        karst_features.dataProvider().addAttributes([QgsField("temp",  QVariant.Int)])
+        karst_features.dataProvider().addAttributes([QgsField('temp',  QVariant.Int)])
         karst_features.commitChanges()
         karst_features.startEditing()
         for feat in karst_features.getFeatures():
