@@ -3,8 +3,8 @@ import os
 import numpy
 import gdal
 import processing
-from qgis.core import QgsRasterLayer, QgsPointXY
-from PyQt5.QtCore import QObject, pyqtSignal
+from qgis.core import QgsRasterLayer, QgsPointXY, QgsField
+from PyQt5.QtCore import QObject, pyqtSignal, QVariant
 
 class WorkerCarteP(QObject):
 
@@ -154,3 +154,323 @@ class WorkerCarteP(QObject):
             self.error.emit(Exception('Une erreur est survenue lors de la génération de la carte P : %s' % str(e)))
         finally:
             self.finished.emit()
+
+
+class WorkerCarteR(QObject):
+
+    results = pyqtSignal()
+    error = pyqtSignal(Exception)
+    finished = pyqtSignal()
+    progress = pyqtSignal(int, int)
+
+    def __init__(self, doss, raster_info, layer_lithology, field_lithology, layer_structure):
+        super().__init__()
+        self.raster_info = raster_info
+        self.doss = doss
+        self.layer_lithology = layer_lithology
+        self.field_lithology = field_lithology
+        self.layer_structure = layer_structure
+
+    def run(self):
+        try:
+            processing.run("gdal:rasterize", {'INPUT': self.layer_lithology,
+                                              'FIELD': self.field_lithology,
+                                              'HEIGHT': self.raster_info['resolution_y'],
+                                              'WIDTH': self.raster_info['resolution_x'],
+                                              'UNITS': 1,
+                                              'EXTENT': self.raster_info['extent']['str_extent'],
+                                              'OUTPUT': os.path.join(self.doss, 'rLithology.tif')})
+
+            if self.layer_structure is None:
+                pass
+            else:
+                self.layer_structure.startEditing()
+                self.layer_structure.dataProvider().addAttributes([QgsField('temp', QVariant.Int)])
+                self.layer_structure.commitChanges()
+                self.layer_structure.startEditing()
+                field_structure = self.layer_structure.fields().indexFromName('temp')
+                for feat in self.layer_structure.getFeatures():
+                    self.layer_structure.changeAttributeValue(feat.id(), field_structure, 4)
+                self.layer_structure.commitChanges()
+                processing.run("gdal:rasterize", {'INPUT': self.layer_structure,
+                                                  'FIELD': 'temp',
+                                                  'HEIGHT': self.raster_info['resolution_y'],
+                                                  'WIDTH': self.raster_info['resolution_x'],
+                                                  'UNITS': 1,
+                                                  'EXTENT': self.raster_info['extent']['str_extent'],
+                                                  'OUTPUT': os.path.join(self.doss, 'rStructure.tif')})
+                self.layer_structure.startEditing()
+                self.layer_structure.dataProvider().deleteAttributes([field_structure])
+                self.layer_structure.updateFields()
+                self.layer_structure.commitChanges()
+
+            # Preparation des donnees pour la comparaison des valeurs des rasters sur chaque pixel
+            val_i = range(0, self.raster_info['size_x'], 1)
+            val_j = range(0, self.raster_info['size_y'], 1)
+
+            if self.layer_lithology is None:
+                pass
+            else:
+                rLithology = QgsRasterLayer(os.path.join(self.doss, 'rLithology.tif'), 'rLithology')
+                pLithology = rLithology.dataProvider()
+            if self.layer_structure is None:
+                pStructure = None
+            else:
+                rStructure = QgsRasterLayer(os.path.join(self.doss, 'rStructure.tif'), 'rStructure')
+                pStructure = rStructure.dataProvider()
+
+            # iteration sur les pixels
+            ValCarteR = numpy.zeros((self.raster_info['size_y'], self.raster_info['size_x']), numpy.int16)
+            for j in val_j:
+                self.progress.emit(j, len(val_j))
+                for i in val_i:
+                    pos = QgsPointXY(
+                        (self.raster_info['extent']['Xmin'] + (i + 1) * self.raster_info['resolution_x']) - self.raster_info[
+                            'resolution_x'] / 2,
+                        (self.raster_info['extent']['Ymax'] - j * self.raster_info['resolution_y']) - self.raster_info[
+                            'resolution_y'] / 2)
+                    if self.layer_lithology is None:
+                        valLithology = 6
+                    else:
+                        valLithology, found = pLithology.sample(pos, 1)
+                        if not found or valLithology == 0:
+                            valLithology = 6
+                    if self.layer_structure is None:
+                        valStructure = 0
+                    else:
+                        valStructure, found = pStructure.sample(pos, 1)
+                        if not found or valStructure == 0:
+                            valStructure = 0
+                        else:
+                            valStructure = 4
+
+                    ValCarteR[j, i] = valLithology + valStructure if valLithology + valStructure <= 4 else 4
+
+            # ecriture du raster a partir de l'array
+            raster = gdal.GetDriverByName('Gtiff').Create(os.path.join(self.doss, 'R_factor.tif'),
+                                                          self.raster_info['size_x'], self.raster_info['size_y'],
+                                                          1, gdal.GDT_Byte)
+
+            raster.SetProjection(self.raster_info['projection_wkt'])
+            raster.SetGeoTransform((self.raster_info['extent']['Xmin'],
+                                    float(self.raster_info['resolution_x']),
+                                    0.0,
+                                    self.raster_info['extent']['Ymax'],
+                                    0.0,
+                                    float(-self.raster_info['resolution_y']),
+                                    ))
+            Band = raster.GetRasterBand(1)
+            Band.WriteArray(ValCarteR, 0, 0)
+            Band.FlushCache()
+            Band.SetNoDataValue(6)
+
+            # fermeture des connexions
+            rLithology = None
+            rStructure = None
+            Raster = None
+            self.results.emit()
+        except Exception as e:
+            self.error.emit(Exception('Une erreur est survenue lors de la génération de la carte R : %s' % str(e)))
+        finally:
+            self.finished.emit()
+
+class WorkerCarteI(QObject):
+
+    results = pyqtSignal()
+    error = pyqtSignal(Exception)
+    finished = pyqtSignal()
+    progress = pyqtSignal(int, int)
+
+    def __init__(self, doss, raster_info, dem, reclass_rules_pente, exokarst, field_exokarst):
+        super().__init__()
+        self.raster_info = raster_info
+        self.doss = doss
+        self.dem = dem
+        self.reclass_rules_pente = reclass_rules_pente
+        self.exokarst = exokarst
+        self.field_exokarst = field_exokarst
+
+    def run(self):
+        try:
+            processing.run("gdalogr:slope", {'INPUT': '',
+                                             'OUTPUT': ''})
+
+            # creation du raster Exokarst si besoin
+            if self.field_exokarst is None:
+                rExokarst = None
+            else:
+                processing.run("gdal:rasterize", {'INPUT': '',
+                                                  'OUTPUT': ''})
+
+            processing.run("grass7:r.reclass", {'INPUT': '',
+                                                'OUTPUT': ''})
+
+            # preparation des variables pour le croisement
+            val_i = range(0, self.raster_info['size_x'], 1)
+            val_j = range(0, self.raster_info['size_y'], 1)
+            pSlope = rSlope.dataProvider()
+            if rExokarst is None:
+                pExokarst = None
+            else:
+                pExokarst = rExokarst.dataProvider()
+            ValCarteI = numpy.zeros((self.raster_info['size_y'], self.raster_info['size_x']), numpy.int16)
+            # iteration sur les pixels: selection de la valeur la plus faible et ecriture dans l'array
+            for j in val_j:
+                self.progress.emit(j, len(val_j))
+                for i in val_i:
+                    pos = QgsPointXY(
+                        (self.raster_info['extent']['Xmin'] + (i + 1) * self.raster_info['resolution_x']) - self.raster_info[
+                            'resolution_x'] / 2,
+                        (self.raster_info['extent']['Ymax'] - j * self.raster_info['resolution_y']) - self.raster_info[
+                            'resolution_y'] / 2)
+                    valSlope, found = pSlope.sample(pos, 1)
+                    if pExokarst is None:
+                        valExokarst = 0
+                    else:
+                        valExokarst, found = pExokarst.sample(pos, 1)
+
+                    ValCarteI[j, i] = max([valSlope, valExokarst]) if (valSlope, valExokarst) != (None, None) else 0
+
+            # ecriture du raster a partir de l'array
+            raster = gdal.GetDriverByName('Gtiff').Create(str(self.doss) + '/I_factor.tif', self.raster_info['size_x'],
+                                                          self.raster_info['size_y'], 1, gdal.GDT_Byte)
+
+            raster.SetProjection(self.raster_info['projection_wkt'])
+            raster.SetGeoTransform((self.raster_info['extent']['Xmin'],
+                                    float(self.raster_info['resolution_x']),
+                                    0.0,
+                                    self.raster_info['extent']['Ymax'],
+                                    0.0,
+                                    float(-self.raster_info['resolution_y']),
+                                    ))
+            Band = raster.GetRasterBand(1)
+            Band.WriteArray(ValCarteI, 0, 0)
+            Band.FlushCache()
+            Band.SetNoDataValue(6)
+
+            # fermeture des connexions
+            rExokarst = None
+            rSlope = None
+            Raster = None
+            self.results.emit()
+        except Exception as e:
+            self.error.emit(Exception('Une erreur est survenue lors de la génération de la carte I : %s' % str(e)))
+        finally:
+            self.finished.emit()
+
+
+class WorkerCarteKa(QObject):
+
+    results = pyqtSignal()
+    error = pyqtSignal(Exception)
+    finished = pyqtSignal()
+    progress = pyqtSignal(int, int)
+
+    def __init__(self, doss, raster_info, mangin, karst_features):
+        super().__init__()
+        self.raster_info = raster_info
+        self.doss = doss
+        self.mangin = mangin
+        self.karst_features = karst_features
+
+    def run(self):
+        try:
+            if self.karst_features is not None:
+                self.karst_features.startEditing()
+                self.karst_features.dataProvider().addAttributes([QgsField('temp', QVariant.Int)])
+                self.karst_features.commitChanges()
+                self.karst_features.startEditing()
+                for feat in self.karst_features.getFeatures():
+                    self.karst_features.changeAttributeValue(feat.id(), self.karst_features.fieldNameIndex('temp'), 4)
+                self.karst_features.commitChanges()
+                # process rasterization and delete temp fields
+                processing.runalg("gdalogr:rasterize_over", {'INPUT' : self.karst_features,
+                                                             'FIELD': 'temp',
+                                                             'HEIGHT': self.raster_info['resolution_y'],
+                                                             'WIDTH': self.raster_info['resolution_x'],
+                                                             'UNITS': 1,
+                                                             'EXTENT': self.raster_info['extent']['str_extent'],
+                                                             'OUTPUT': str(self.doss) + '/rKarst_features.tif'})
+                self.karst_features.startEditing()
+                self.karst_features.dataProvider().deleteAttributes([self.karst_features.fieldNameIndex('temp')])
+                self.karst_features.updateFields()
+                self.karst_features.commitChanges()
+
+                rKarst_features = QgsRasterLayer(str(self.doss) + '/rKarst_features.tif', 'rKarst_features')
+            else:
+                rKarst_features = None
+
+            # Croisement des valeurs des rasters sur chaque pixel
+            valCarteKa = numpy.zeros((self.raster_info['size_y'], self.raster_info['size_x']), numpy.int16)
+            val_i = range(0, self.raster_info['size_x'], 1)
+            val_j = range(0, self.raster_info['size_y'], 1)
+            if rKarst_features is None:
+                pKarst_features = None
+            else:
+                pKarst_features = rKarst_features.dataProvider()
+            for j in val_j:
+                self.progress.emit(j, len(val_j))
+                for i in val_i:
+                    pos = QgsPointXY(
+                        (self.raster_info['extent']['Xmin'] + (i + 1) * self.raster_info['resolution_x']) - self.raster_info[
+                            'resolution_x'] / 2,
+                        (self.raster_info['extent']['Ymax'] - j * self.raster_info['resolution_y']) - self.raster_info[
+                            'resolution_y'] / 2)
+                    if pKarst_features:
+                        valKarst_features, found = pKarst_features.sample(pos, 1)
+                        if found and valKarst_features:
+                            valCarteKa[j, i] = 4
+                        else:
+                            valCarteKa[j, i] = self.mangin
+                    else:
+                        valCarteKa[j, i] = self.mangin
+
+            # ecriture du raster a partir de l'array
+            raster = gdal.GetDriverByName('Gtiff').Create(str(self.doss) + '/Ka_factor.tif', self.raster_info['size_x'],
+                                                          self.raster_info['size_y'], 1, gdal.GDT_Byte)
+
+            raster.SetProjection(self.raster_info['projection_wkt'])
+            raster.SetGeoTransform((self.raster_info['extent']['Xmin'],
+                                    float(self.raster_info['resolution_x']),
+                                    0.0,
+                                    self.raster_info['extent']['Ymax'],
+                                    0.0,
+                                    float(-self.raster_info['resolution_y']),
+                                    ))
+            Band = raster.GetRasterBand(1)
+            Band.WriteArray(valCarteKa, 0, 0)
+            Band.FlushCache()
+            Band.SetNoDataValue(0)
+
+            # fermeture des connexions
+            rKarst_features = None
+            Raster = None
+            self.results.emit()
+        except Exception as e:
+            self.error.emit(Exception('Une erreur est survenue lors de la génération de la carte Ka : %s' % str(e)))
+        finally:
+            self.finished.emit()
+
+
+class WorkerCarteFinale(QObject):
+
+    results = pyqtSignal()
+    error = pyqtSignal(Exception)
+    finished = pyqtSignal()
+    progress = pyqtSignal(int, int)
+
+    def __init__(self, doss, raster_info, dem, reclass_rules_pente, exokarst, field_exokarst):
+        super().__init__()
+        self.raster_info = raster_info
+        self.doss = doss
+        self.dem = dem
+        self.reclass_rules_pente = reclass_rules_pente
+        self.exokarst = exokarst
+        self.field_exokarst = field_exokarst
+
+    def run(self):
+        pass
+
+
+
+

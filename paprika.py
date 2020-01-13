@@ -35,12 +35,7 @@ from qgis.gui import *
 from qgis.core import *
 import webbrowser
 import subprocess
-from worker import WorkerCarteP
-
-import Carte_R
-import Carte_I
-import Carte_Ka
-import Carte_Finale
+from worker import WorkerCarteP, WorkerCarteR, WorkerCarteI, WorkerCarteKa, WorkerCarteFinale
 
 
 class Paprika:
@@ -414,17 +409,32 @@ class Paprika:
         for lyr in QgsProject.instance().mapLayers().values():
             if lyr.name() == "R factor": 
                 QgsProject.instance().removeMapLayers( [lyr.id()] )
-                
-        Carte_R.genere_carteR(self.dockwidget.lineEdit_dossier_travail.text(),
-                                self.raster_info,
-                                lithology,
-                                field_lithology,
-                                structure)
 
-        lay_carteR = QgsRasterLayer(str(self.dockwidget.lineEdit_dossier_travail.text())+'/R_factor.tif','R factor')
+        self.carte_r_worker = WorkerCarteR(self.dockwidget.lineEdit_dossier_travail.text(),
+                                           self.raster_info,
+                                           lithology,
+                                           field_lithology,
+                                           structure)
+        self.carte_r_thread = QThread()
+        self.carte_r_worker.results.connect(self.on_carte_r_results)
+        self.carte_r_worker.progress.connect(self.on_progress)
+        self.carte_r_worker.error.connect(self.on_error)
+        self.carte_r_worker.finished.connect(self.on_carte_r_finished)
+
+        self.carte_r_worker.moveToThread(self.carte_r_thread)
+        self.carte_r_thread.started.connect(self.carte_r_worker.run)
+        self.carte_r_thread.start()
+
+    def on_carte_r_results(self):
+        lay_carteR = QgsRasterLayer(str(self.dockwidget.lineEdit_dossier_travail.text()) + '/R_factor.tif',
+                                    'R factor')
         self.set_raster_style(lay_carteR)
         QgsProject.instance().addMapLayer(lay_carteR)
         self.showdialog('R factor map created wih success!', 'Well done!')
+
+    def on_carte_r_finished(self):
+        self.carte_p_thread.quit()
+        self.carte_p_thread.wait()
             
     def carte_i(self):
         """teste les parametres et lance la generation de la carte I"""
