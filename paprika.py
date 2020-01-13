@@ -553,7 +553,7 @@ class Paprika:
     def open_a_propos(self):
         """fonction d'ouverture de la fenetre A propos, connectee a son PushButton"""
         a_propos = Ui_A_propos()
-        a_propos.show()
+        a_propos.exec()
     
     def download_methodo(self):
         """fonction d'ouverture de la methodologie officielle PaPRIKa"""

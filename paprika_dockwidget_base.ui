@@ -270,7 +270,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>4</number>
       </property>
       <property name="iconSize">
        <size>
@@ -2097,7 +2097,7 @@
     <item>
      <widget class="QProgressBar" name="progress">
       <property name="value">
-       <number>24</number>
+       <number>0</number>
       </property>
      </widget>
     </item>
