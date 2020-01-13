@@ -24,7 +24,7 @@ import os, sys
 BASE_DIR = os.path.dirname(__file__)
 sys.path.append(BASE_DIR)
 
-from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, Qt
+from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, Qt, QThread
 from PyQt5.QtWidgets import QAction,QMessageBox, QFileDialog, QDialog
 from PyQt5.QtGui import QIcon, QColor
 
@@ -35,8 +35,8 @@ from qgis.gui import *
 from qgis.core import *
 import webbrowser
 import subprocess
+from worker import WorkerCarteP
 
-import Carte_P
 import Carte_R
 import Carte_I
 import Carte_Ka
@@ -250,85 +250,24 @@ class Paprika:
             self.dockwidget.mFieldComboBox_EPIKARST.setFilters(QgsFieldProxyModel.Numeric)
             self.dockwidget.mFieldComboBox_EPIKARST.setLayer(self.dockwidget.mMapLayerComboBox_EPIKARST.currentLayer())
             self.dockwidget.mMapLayerComboBox_EPIKARST.layerChanged.connect(self.dockwidget.mFieldComboBox_EPIKARST.setLayer)
-            self.dockwidget.checkBox_Epikarst.stateChanged.connect(self.desactive_widget_Epikarst)
                 #SINKING STREAM CATCHMENT
             self.dockwidget.mFieldComboBox_SINKING_CATCHMENT.setFilters(QgsFieldProxyModel.Numeric)
             self.dockwidget.mFieldComboBox_SINKING_CATCHMENT.setLayer(self.dockwidget.mMapLayerComboBox_SINKING_CATCHMENT.currentLayer())
             self.dockwidget.mMapLayerComboBox_SINKING_CATCHMENT.layerChanged.connect(self.dockwidget.mFieldComboBox_SINKING_CATCHMENT.setLayer)
-            self.dockwidget.checkBox_Sinking.stateChanged.connect(self.desactive_widget_Sinking)
                 #LITHOLOGY
             self.dockwidget.mFieldComboBox_ROCHE.setFilters(QgsFieldProxyModel.Numeric)
             self.dockwidget.mFieldComboBox_ROCHE.setLayer(self.dockwidget.mMapLayerComboBox_ROCHE.currentLayer())
             self.dockwidget.mMapLayerComboBox_ROCHE.layerChanged.connect(self.dockwidget.mFieldComboBox_ROCHE.setLayer)
-                #STRUCTURE
-            self.dockwidget.checkBox_STRUCTURE.stateChanged.connect(self.desactive_widget_structure)
                 #KARST FEATURES I
             self.dockwidget.mFieldComboBox_OBJETS_EXOKARSTIQUES.setFilters(QgsFieldProxyModel.Numeric)
             self.dockwidget.mFieldComboBox_OBJETS_EXOKARSTIQUES.setLayer(self.dockwidget.mMapLayerComboBox_OBJETS_EXOKARSTIQUES.currentLayer())
             self.dockwidget.mMapLayerComboBox_OBJETS_EXOKARSTIQUES.layerChanged.connect(self.dockwidget.mFieldComboBox_OBJETS_EXOKARSTIQUES.setLayer)
-            self.dockwidget.checkBox_OBJETS_EXOKARSTIQUES.stateChanged.connect(self.desactive_widget_objets_exokarstiques)
-                #KARST_FEATURES Ka
-            self.dockwidget.checkBox_KARST_FEATURES.stateChanged.connect(self.desactive_widget_karst_features)
-
             # mise a jour du total de la ponderation (Final Map)
             self.dockwidget.spinBox_PondP.valueChanged.connect(self.calcul_somme_pond)
             self.dockwidget.spinBox_PondR.valueChanged.connect(self.calcul_somme_pond)
             self.dockwidget.spinBox_PondI.valueChanged.connect(self.calcul_somme_pond)
             self.dockwidget.spinBox_PondKa.valueChanged.connect(self.calcul_somme_pond)
     
-    def desactive_widget_Epikarst(self):
-        if self.dockwidget.checkBox_Epikarst.isChecked():
-            self.dockwidget.mMapLayerComboBox_EPIKARST.setEnabled(True)
-            self.dockwidget.mFieldComboBox_EPIKARST.setEnabled(True)
-            self.dockwidget.label_EPIKARST.setStyleSheet('color: black')
-            self.dockwidget.label_index_EPIKARST.setStyleSheet('color: black')
-        else:
-            self.dockwidget.mMapLayerComboBox_EPIKARST.setDisabled(True)
-            self.dockwidget.mFieldComboBox_EPIKARST.setDisabled(True)
-            self.dockwidget.label_EPIKARST.setStyleSheet('color: grey')
-            self.dockwidget.label_index_EPIKARST.setStyleSheet('color: grey')
-            
-    def desactive_widget_Sinking(self):
-        if self.dockwidget.checkBox_Sinking.isChecked():
-            self.dockwidget.mMapLayerComboBox_SINKING_CATCHMENT.setEnabled(True)
-            self.dockwidget.mFieldComboBox_SINKING_CATCHMENT.setEnabled(True)
-            self.dockwidget.label_SINKING.setStyleSheet('color: black')
-            self.dockwidget.label_index_SINKING.setStyleSheet('color: black')
-        else:
-            self.dockwidget.mMapLayerComboBox_SINKING_CATCHMENT.setDisabled(True)
-            self.dockwidget.mFieldComboBox_SINKING_CATCHMENT.setDisabled(True)
-            self.dockwidget.label_SINKING.setStyleSheet('color: grey')
-            self.dockwidget.label_index_SINKING.setStyleSheet('color: grey')
-    
-    def desactive_widget_structure(self):
-        if self.dockwidget.checkBox_STRUCTURE.isChecked():
-            self.dockwidget.mMapLayerComboBox_STRUCTURE.setEnabled(True)
-            self.dockwidget.label_STRUCTURE.setStyleSheet('color: black')
-        else:
-            self.dockwidget.mMapLayerComboBox_STRUCTURE.setDisabled(True)
-            self.dockwidget.label_STRUCTURE.setStyleSheet('color: grey')
-        
-    def desactive_widget_objets_exokarstiques(self):
-        if self.dockwidget.checkBox_OBJETS_EXOKARSTIQUES.isChecked():
-            self.dockwidget.mMapLayerComboBox_OBJETS_EXOKARSTIQUES.setEnabled(True)
-            self.dockwidget.mFieldComboBox_OBJETS_EXOKARSTIQUES.setEnabled(True)
-            self.dockwidget.label_OBJETS_EXOKARSTIQUES.setStyleSheet('color: black')
-            self.dockwidget.label_index_OBJETS_EXOKARSTIQUES.setStyleSheet('color: black')
-            self.dockwidget.label_text_I.setStyleSheet('color: black')
-        else:
-            self.dockwidget.mMapLayerComboBox_OBJETS_EXOKARSTIQUES.setDisabled(True)
-            self.dockwidget.mFieldComboBox_OBJETS_EXOKARSTIQUES.setDisabled(True)
-            self.dockwidget.label_OBJETS_EXOKARSTIQUES.setStyleSheet('color: grey')
-            self.dockwidget.label_index_OBJETS_EXOKARSTIQUES.setStyleSheet('color: grey')
-            self.dockwidget.label_text_I.setStyleSheet('color: grey')
-        
-    def desactive_widget_karst_features(self):
-        if self.dockwidget.checkBox_KARST_FEATURES.isChecked():
-            self.dockwidget.mMapLayerComboBox_KARST_FEATURES.setEnabled(True)
-            self.dockwidget.label_KARST_FEATURES.setStyleSheet('color: black')
-        else:
-            self.dockwidget.mMapLayerComboBox_KARST_FEATURES.setDisabled(True)
-            self.dockwidget.label_KARST_FEATURES.setStyleSheet('color: grey')
 
     def calcul_somme_pond(self):
         P = self.dockwidget.spinBox_PondP.value()
@@ -421,20 +360,13 @@ class Paprika:
             field_sinking = self.dockwidget.mFieldComboBox_SINKING_CATCHMENT.currentField()
         else : 
             sinking = None
-            field_sinking = None 
-
+            field_sinking = None
         #lance la generation de la carte P
         for lyr in QgsProject.instance().mapLayers().values():
             if lyr.name() == "P factor": 
-                QgsProject.instance().removeMapLayers( [lyr.id()] )
-        print((self.raster_info['extent']['Xmin'],
-     self.raster_info['resolution_x'],
-     0,
-     self.raster_info['extent']['Ymax'],
-     -self.raster_info['resolution_y'],
-     0,
-     ))
-        Carte_P.genere_carteP(self.raster_info,
+                QgsProject.instance().removeMapLayers( [lyr.id()])
+
+        self.carte_p_worker = WorkerCarteP(self.raster_info,
                             self.dockwidget.lineEdit_dossier_travail.text(),
                             self.dockwidget.mMapLayerComboBox_ZNS.currentLayer(),
                             sol,
@@ -443,13 +375,27 @@ class Paprika:
                             field_epikarst,
                             sinking,
                             field_sinking)
-            
+        self.carte_p_thread = QThread()
+        self.carte_p_worker.results.connect(self.on_carte_p_results)
+        self.carte_p_worker.progress.connect(self.on_progress)
+        self.carte_p_worker.error.connect(self.on_error)
+        self.carte_p_worker.finished.connect(self.on_carte_p_finished)
+
+        self.carte_p_worker.moveToThread(self.carte_p_thread)
+        self.carte_p_thread.started.connect(self.carte_p_worker.run)
+        self.carte_p_thread.start()
+
+    def on_carte_p_results(self):
         #genere le style et charge le tif dans QGIS avec un message
         lay_carteP = QgsRasterLayer(str(self.dockwidget.lineEdit_dossier_travail.text())+'/P_factor.tif','P factor')
         self.set_raster_style(lay_carteP)
         QgsProject.instance().addMapLayer(lay_carteP)
         self.showdialog('P factor map created wih success!', 'Well done!')
-        
+
+    def on_carte_p_finished(self):
+        self.carte_p_thread.quit()
+        self.carte_p_thread.wait()
+
     def carte_r(self):
         """teste les parametres et lance la generation de la carte R"""
         if self.dockwidget.mFieldComboBox_ROCHE.currentField() == u'':
@@ -505,7 +451,7 @@ class Paprika:
                 QgsProject.instance().removeMapLayers( [lyr.id()] )
                 
         Carte_I.genere_carteI(self.dockwidget.lineEdit_dossier_travail.text(),
-                                layer,
+                                self.raster_info,
                                 pente,
                                 os.path.dirname(os.path.abspath(__file__))+'/reclass_rules/reclass_rules_slope.txt',
                                 exokarst,
@@ -519,19 +465,6 @@ class Paprika:
         
     def carte_ka(self):
         """teste les parametres et lance la generation de la carte Ka"""
-        ########################## test pour ne pas lancer la fonction sans que la verification soit correcte
-            #verifie que l'extension exist
-        if os.path.exists(self.dockwidget.lineEdit_dossier_travail.text() + '/Extension.tif')== False :
-            return self.showdialog('Please check if the directory of generating is filled and that the guide is already generate...', 'Layer Extension missing in the system...')
-                
-        ############################# Si les tests sont satisfait lance la fonction
-        #recupere l'extension
-        for lyr in QgsProject.instance().mapLayers().values():
-            if lyr.name() == "Extension": 
-                layer = QgsRasterLayer(lyr.source(),"extension")
-            else :
-                pass
-        #genere les parametres
         if self.dockwidget.checkBox_KARST_FEATURES.isChecked():
             karst_features = self.dockwidget.mMapLayerComboBox_KARST_FEATURES.currentLayer()
             
@@ -545,31 +478,16 @@ class Paprika:
                 
         Carte_Ka.genere_carteKa(int(self.dockwidget.comboBox_MANGIN.currentText()),
                                 karst_features,
-                                layer, 
+                                self.raster_info,
                                 self.dockwidget.lineEdit_dossier_travail.text())
                                 
         #genere le style et charge le tif dans QGIS
         lay_carteKa = QgsRasterLayer(str(self.dockwidget.lineEdit_dossier_travail.text())+'/Ka_factor.tif','Ka factor')
-        s = QgsRasterShader()
-        c = QgsColorRampShader()
-        c.setColorRampType(QgsColorRampShader.EXACT)
-        i = []
-        i.append(QgsColorRampShader.ColorRampItem(0, QColor('#FFFFFF'), '0'))
-        i.append(QgsColorRampShader.ColorRampItem(1, QColor('#A8D990'), '1'))
-        i.append(QgsColorRampShader.ColorRampItem(2, QColor('#F6F085'), '2'))
-        i.append(QgsColorRampShader.ColorRampItem(3, QColor('#E6A55B'), '3'))
-        i.append(QgsColorRampShader.ColorRampItem(4, QColor('#A43C27'), '4'))
-        c.setColorRampItemList(i)
-        s.setRasterShaderFunction(c)
-        ps = QgsSingleBandPseudoColorRenderer(lay_carteKa.dataProvider(), 1, s)
-        lay_carteKa.setRenderer(ps)
+        self.set_raster_style(lay_carteKa)
         QgsProject.instance().addMapLayer(lay_carteKa)
         self.showdialog('Ka factor map created wih success!', 'Well done!')
     
     def carte_finale(self):
-        """fonction de generation, mise en forme et chargement de la carte finale"""
-        if os.path.exists(self.dockwidget.lineEdit_dossier_travail.text())== False :
-            return self.showdialog('Please check if the directory of generating is filled', 'Directory missing in the system...')
         #verifie la ponderation
         pP=self.dockwidget.spinBox_PondP.value()
         pR=self.dockwidget.spinBox_PondR.value()
@@ -582,14 +500,6 @@ class Paprika:
         for lyr in QgsProject.instance().mapLayers().values():
             if lyr.name() == "Vulnerability Map": 
                 QgsProject.instance().removeMapLayers( [lyr.id()] )
-
-        ############################# Si les tests sont satisfait lance la fonction
-        #recupere l'extension
-        for lyr in QgsProject.instance().mapLayers().values():
-            if lyr.name() == "Extension": 
-                layer = QgsRasterLayer(lyr.source(),"extension")
-            else :
-                pass
                 
         Carte_Finale.genere_carteFinale(self.dockwidget.spinBox_PondP.value(),
                                         self.dockwidget.spinBox_PondR.value(),
@@ -600,25 +510,20 @@ class Paprika:
                                         self.dockwidget.mMapLayerComboBox_CarteIF.currentLayer(),
                                         self.dockwidget.mMapLayerComboBox_CarteKaF.currentLayer(),
                                         self.dockwidget.lineEdit_dossier_travail.text(),
-                                        layer)
+                                        self.raster_info)
                                         
         #genere le style et charge le tif dans QGIS
         lay_carteFinale = QgsRasterLayer(str(self.dockwidget.lineEdit_dossier_travail.text())+'/Vulnerability_Map.tif','Vulnerability Map')
-        s = QgsRasterShader()
-        c = QgsColorRampShader()
-        c.setColorRampType(QgsColorRampShader.EXACT)
-        i = []
-        i.append(QgsColorRampShader.ColorRampItem(0, QColor('#FFFFFF'), '0'))
-        i.append(QgsColorRampShader.ColorRampItem(1, QColor('#A8D990'), '1'))
-        i.append(QgsColorRampShader.ColorRampItem(2, QColor('#F6F085'), '2'))
-        i.append(QgsColorRampShader.ColorRampItem(3, QColor('#E6A55B'), '3'))
-        i.append(QgsColorRampShader.ColorRampItem(4, QColor('#A43C27'), '4'))
-        c.setColorRampItemList(i)
-        s.setRasterShaderFunction(c)
-        ps = QgsSingleBandPseudoColorRenderer(lay_carteFinale.dataProvider(), 1, s)
-        lay_carteFinale.setRenderer(ps)
+        self.set_raster_style(lay_carteFinale)
         QgsProject.instance().addMapLayer(lay_carteFinale)
         return self.showdialog('Final map created wih success!', 'Well done!')
+
+    def on_error(self, e):
+        self.showdialog(str(e), 'Oups!')
+
+    def on_progress(self, value, tot):
+        self.dockwidget.progress.setMaximum(100)
+        self.dockwidget.progress.setValue((value*100/tot) + 1)
     
     def showdialog (self, text, title):
         """fonction permettant d'afficher des messages a l'utilisateur"""
@@ -647,10 +552,8 @@ class Paprika:
     
     def open_a_propos(self):
         """fonction d'ouverture de la fenetre A propos, connectee a son PushButton"""
-        Dialog = QDialog()
-        md = Ui_A_propos()
-        md.setupUi(Dialog)
-        Dialog.exec_()
+        a_propos = Ui_A_propos()
+        a_propos.show()
     
     def download_methodo(self):
         """fonction d'ouverture de la methodologie officielle PaPRIKa"""

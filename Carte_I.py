@@ -5,36 +5,21 @@ import numpy
 from shutil import copyfile
 import os
 
-def genere_carteI(doss, extension, dem, reclass_rules_pente,exokarst,field_exokarst):
+def genere_carteI(doss, raster_info, dem, reclass_rules_pente,exokarst,field_exokarst):
     #creation du raster Pente
-    processing.runalg("gdalogr:slope",dem,1,False,False,True,1,str(doss)+'/Pente.tif')
-    rPente = QgsRasterLayer(str(doss)+'/Pente.tif', "Pente")
+    processing.run("gdalogr:slope", {'INPUT': '',
+                                     'OUTPUT': ''})
+
     #creation du raster Exokarst si besoin
     if field_exokarst is None:
         rExokarst = None
     else:
-        copyfile(str(doss)+'/Extension.tif',str(doss)+'/rExokarst.tif')
-        processing.runalg("gdalogr:rasterize_over", exokarst, field_exokarst, str(doss)+'/rExokarst.tif')
-        rExokarst = QgsRasterLayer(str(doss)+'/rExokarst.tif', "rExokarst")
+        processing.run("gdal:rasterize",{'INPUT': '',
+                                         'OUTPUT': ''})
 
-    #recuperation des bornes XY de la zone
-    extension1 = gdal.Open(extension.source())
-    ExtentInfo = extension1.GetGeoTransform()
-    Xmin = str(ExtentInfo[0])
-    Ymin = str(ExtentInfo[3])
-    Xmax = str(ExtentInfo[0] + ExtentInfo[1] * extension1.RasterXSize)
-    Ymax = str(ExtentInfo[3] + ExtentInfo[5] * extension1.RasterYSize)
-    Extent =(Xmin, Xmax, Ymax, Ymin)
-    StrExtent = ','.join(Extent)
+    processing.run("grass7:r.reclass", {'INPUT': '',
+                                        'OUTPUT': ''})
 
-    #reclassement de la pente
-    if QGis.QGIS_VERSION_INT > 21800:
-        processing.runalg("grass7:r.reclass", rPente, reclass_rules_pente,"", StrExtent, ExtentInfo[1], str(doss)+'/Slope.tif')
-    else :
-        processing.runalg("grass7:r.reclass", rPente, reclass_rules_pente, StrExtent, ExtentInfo[1], str(doss)+'/Slope.tif')
-
-    rSlope = QgsRasterLayer(str(doss)+'/Slope.tif', "rSlope")
-    rPente = None
     #preparation des variables pour le croisement
     val_i = range(0, extension1.RasterXSize, 1)
     val_j = range(0, extension1.RasterYSize, 1)
@@ -53,12 +38,8 @@ def genere_carteI(doss, extension, dem, reclass_rules_pente,exokarst,field_exoka
                 valExokarst = 0
             else:
                 valExokarst = pExokarst.identify(pos, QgsRaster.IdentifyFormatValue).results()[1]
-                
-            ValCarteI[j,i] = max([valSlope, valExokarst]) if (valSlope,valExokarst) != (None,None) else 0 
 
-    #recuperation du systeme de coordonnees
-    source = gdal.Open(extension.source())
-    Syst_coord = source.GetProjection()
+            ValCarteI[j,i] = max([valSlope, valExokarst]) if (valSlope,valExokarst) != (None,None) else 0
 
     #ecriture du raster a partir de l'array
     Raster = gdal.GetDriverByName('Gtiff').Create(str(doss)+'/I_factor.tif', extension1.RasterXSize, extension1.RasterYSize, 1, gdal.GDT_Byte)
@@ -70,7 +51,7 @@ def genere_carteI(doss, extension, dem, reclass_rules_pente,exokarst,field_exoka
     Band.WriteArray(ValCarteI, 0, 0)
     Band.FlushCache()
     Band.SetNoDataValue(0)
-    
+
     #fermeture des connexions
     rExokarst = None
     rSlope = None

@@ -44,8 +44,69 @@ class Ui_PaprikaDockWidgetBase(QDockWidget, FORM_CLASS):
         # http://qt-project.org/doc/qt-4.8/designer-using-a-ui-file.html
         # #widgets-and-dialogs-with-auto-connect
         self.setupUi(self)
+        self.connectUi()
 
     def closeEvent(self, event):
         self.closingPlugin.emit()
         event.accept()
 
+    def connectUi(self):
+        self.checkBox_Sinking.stateChanged.connect(self.desactive_widget_Sinking)
+        self.checkBox_STRUCTURE.stateChanged.connect(self.desactive_widget_structure)
+        self.checkBox_OBJETS_EXOKARSTIQUES.stateChanged.connect(self.desactive_widget_objets_exokarstiques)
+        self.checkBox_KARST_FEATURES.stateChanged.connect(self.desactive_widget_karst_features)
+        self.checkBox_Epikarst.stateChanged.connect(self.desactive_widget_Epikarst)
+
+    def desactive_widget_Epikarst(self):
+        if self.checkBox_Epikarst.isChecked():
+            self.mMapLayerComboBox_EPIKARST.setEnabled(True)
+            self.mFieldComboBox_EPIKARST.setEnabled(True)
+            self.label_EPIKARST.setStyleSheet('color: black')
+            self.label_index_EPIKARST.setStyleSheet('color: black')
+        else:
+            self.mMapLayerComboBox_EPIKARST.setDisabled(True)
+            self.mFieldComboBox_EPIKARST.setDisabled(True)
+            self.label_EPIKARST.setStyleSheet('color: grey')
+            self.label_index_EPIKARST.setStyleSheet('color: grey')
+
+    def desactive_widget_Sinking(self):
+        if self.checkBox_Sinking.isChecked():
+            self.mMapLayerComboBox_SINKING_CATCHMENT.setEnabled(True)
+            self.mFieldComboBox_SINKING_CATCHMENT.setEnabled(True)
+            self.label_SINKING.setStyleSheet('color: black')
+            self.label_index_SINKING.setStyleSheet('color: black')
+        else:
+            self.mMapLayerComboBox_SINKING_CATCHMENT.setDisabled(True)
+            self.mFieldComboBox_SINKING_CATCHMENT.setDisabled(True)
+            self.label_SINKING.setStyleSheet('color: grey')
+            self.label_index_SINKING.setStyleSheet('color: grey')
+
+    def desactive_widget_structure(self):
+        if self.checkBox_STRUCTURE.isChecked():
+            self.mMapLayerComboBox_STRUCTURE.setEnabled(True)
+            self.label_STRUCTURE.setStyleSheet('color: black')
+        else:
+            self.mMapLayerComboBox_STRUCTURE.setDisabled(True)
+            self.label_STRUCTURE.setStyleSheet('color: grey')
+
+    def desactive_widget_objets_exokarstiques(self):
+        if self.checkBox_OBJETS_EXOKARSTIQUES.isChecked():
+            self.mMapLayerComboBox_OBJETS_EXOKARSTIQUES.setEnabled(True)
+            self.mFieldComboBox_OBJETS_EXOKARSTIQUES.setEnabled(True)
+            self.label_OBJETS_EXOKARSTIQUES.setStyleSheet('color: black')
+            self.label_index_OBJETS_EXOKARSTIQUES.setStyleSheet('color: black')
+            self.label_text_I.setStyleSheet('color: black')
+        else:
+            self.mMapLayerComboBox_OBJETS_EXOKARSTIQUES.setDisabled(True)
+            self.mFieldComboBox_OBJETS_EXOKARSTIQUES.setDisabled(True)
+            self.label_OBJETS_EXOKARSTIQUES.setStyleSheet('color: grey')
+            self.label_index_OBJETS_EXOKARSTIQUES.setStyleSheet('color: grey')
+            self.label_text_I.setStyleSheet('color: grey')
+
+    def desactive_widget_karst_features(self):
+        if self.checkBox_KARST_FEATURES.isChecked():
+            self.mMapLayerComboBox_KARST_FEATURES.setEnabled(True)
+            self.label_KARST_FEATURES.setStyleSheet('color: black')
+        else:
+            self.mMapLayerComboBox_KARST_FEATURES.setDisabled(True)
+            self.label_KARST_FEATURES.setStyleSheet('color: grey')
