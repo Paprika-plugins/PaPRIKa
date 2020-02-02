@@ -500,20 +500,33 @@ class Paprika:
         for lyr in QgsProject.instance().mapLayers().values():
             if lyr.name() == "Ka factor": 
                 QgsProject.instance().removeMapLayers([lyr.id()])
-                
-        Carte_Ka.genere_carteKa(int(self.dockwidget.comboBox_MANGIN.currentText()),
-                                karst_features,
+
+        self.carte_ka_worker = WorkerCarteKa(self.dockwidget.lineEdit_dossier_travail.text(),
                                 self.raster_info,
-                                self.dockwidget.lineEdit_dossier_travail.text())
-                                
-        #genere le style et charge le tif dans QGIS
+                                int(self.dockwidget.comboBox_MANGIN.currentText()),
+                                karst_features)
+
+        self.carte_ka_thread = QThread()
+        self.carte_ka_worker.results.connect(self.on_carte_ka_results)
+        self.carte_ka_worker.progress.connect(self.on_progress)
+        self.carte_ka_worker.error.connect(self.on_error)
+        self.carte_ka_worker.finished.connect(self.on_carte_ka_finished)
+
+        self.carte_ka_worker.moveToThread(self.carte_ka_thread)
+        self.carte_ka_thread.started.connect(self.carte_ka_worker.run)
+        self.carte_ka_thread.start()
+
+    def on_carte_ka_results(self):
         lay_carteKa = QgsRasterLayer(str(self.dockwidget.lineEdit_dossier_travail.text())+'/Ka_factor.tif','Ka factor')
         self.set_raster_style(lay_carteKa)
         QgsProject.instance().addMapLayer(lay_carteKa)
         self.showdialog('Ka factor map created wih success!', 'Well done!')
+
+    def on_carte_ka_finished(self):
+        self.carte_ka_thread.quit()
+        self.carte_ka_thread.wait()
     
     def carte_finale(self):
-        #verifie la ponderation
         pP=self.dockwidget.spinBox_PondP.value()
         pR=self.dockwidget.spinBox_PondR.value()
         pI=self.dockwidget.spinBox_PondI.value()
@@ -525,23 +538,37 @@ class Paprika:
         for lyr in QgsProject.instance().mapLayers().values():
             if lyr.name() == "Vulnerability Map": 
                 QgsProject.instance().removeMapLayers( [lyr.id()] )
-                
-        Carte_Finale.genere_carteFinale(self.dockwidget.spinBox_PondP.value(),
+
+        self.carte_finale_worker = WorkerCarteFinale(self.dockwidget.lineEdit_dossier_travail.text(),
+                                        self.raster_info,
+                                        self.dockwidget.spinBox_PondP.value(),
                                         self.dockwidget.spinBox_PondR.value(),
                                         self.dockwidget.spinBox_PondI.value(),
                                         self.dockwidget.spinBox_PondKa.value(),
                                         self.dockwidget.mMapLayerComboBox_CartePF.currentLayer(),
                                         self.dockwidget.mMapLayerComboBox_CarteRF.currentLayer(),
                                         self.dockwidget.mMapLayerComboBox_CarteIF.currentLayer(),
-                                        self.dockwidget.mMapLayerComboBox_CarteKaF.currentLayer(),
-                                        self.dockwidget.lineEdit_dossier_travail.text(),
-                                        self.raster_info)
-                                        
-        #genere le style et charge le tif dans QGIS
+                                        self.dockwidget.mMapLayerComboBox_CarteKaF.currentLayer())
+
+        self.carte_finale_thread = QThread()
+        self.carte_finale_worker.results.connect(self.on_carte_finale_results)
+        self.carte_finale_worker.progress.connect(self.on_progress)
+        self.carte_finale_worker.error.connect(self.on_error)
+        self.carte_finale_worker.finished.connect(self.on_carte_finale_finished)
+
+        self.carte_finale_worker.moveToThread(self.carte_finale_thread)
+        self.carte_finale_thread.started.connect(self.carte_finale_worker.run)
+        self.carte_finale_thread.start()
+
+    def on_carte_finale_results(self):
         lay_carteFinale = QgsRasterLayer(str(self.dockwidget.lineEdit_dossier_travail.text())+'/Vulnerability_Map.tif','Vulnerability Map')
         self.set_raster_style(lay_carteFinale)
         QgsProject.instance().addMapLayer(lay_carteFinale)
         return self.showdialog('Final map created wih success!', 'Well done!')
+
+    def on_carte_finale_finished(self):
+        self.carte_finale_thread.quit()
+        self.carte_finale_thread.wait()
 
     def on_error(self, e):
         """If something wrong happen in the thread, show what..."""

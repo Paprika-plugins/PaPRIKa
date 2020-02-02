@@ -4,6 +4,7 @@ import numpy
 import gdal
 import processing
 from qgis.core import QgsRasterLayer, QgsPointXY, QgsField
+from qgis.analysis import QgsRasterCalculator, QgsRasterCalculatorEntry
 from PyQt5.QtCore import QObject, pyqtSignal, QVariant
 
 class WorkerCarteP(QObject):
@@ -410,18 +411,18 @@ class WorkerCarteKa(QObject):
                 self.karst_features.commitChanges()
                 self.karst_features.startEditing()
                 for feat in self.karst_features.getFeatures():
-                    self.karst_features.changeAttributeValue(feat.id(), self.karst_features.fieldNameIndex('temp'), 4)
+                    self.karst_features.changeAttributeValue(feat.id(), self.karst_features.fields().indexFromName('temp'), 4)
                 self.karst_features.commitChanges()
-                # process rasterization and delete temp fields
-                processing.runalg("gdalogr:rasterize_over", {'INPUT' : self.karst_features,
-                                                             'FIELD': 'temp',
-                                                             'HEIGHT': self.raster_info['resolution_y'],
-                                                             'WIDTH': self.raster_info['resolution_x'],
-                                                             'UNITS': 1,
-                                                             'EXTENT': self.raster_info['extent']['str_extent'],
-                                                             'OUTPUT': str(self.doss) + '/rKarst_features.tif'})
+
+                processing.run("gdal:rasterize", {'INPUT': self.karst_features,
+                                                  'FIELD': 'temp',
+                                                  'HEIGHT': self.raster_info['resolution_y'],
+                                                  'WIDTH': self.raster_info['resolution_x'],
+                                                  'UNITS': 1,
+                                                  'EXTENT': self.raster_info['extent']['str_extent'],
+                                                  'OUTPUT': str(self.doss) + '/rKarst_features.tif'})
                 self.karst_features.startEditing()
-                self.karst_features.dataProvider().deleteAttributes([self.karst_features.fieldNameIndex('temp')])
+                self.karst_features.dataProvider().deleteAttributes([self.karst_features.fields().indexFromName('temp')])
                 self.karst_features.updateFields()
                 self.karst_features.commitChanges()
 
@@ -488,18 +489,69 @@ class WorkerCarteFinale(QObject):
     finished = pyqtSignal()
     progress = pyqtSignal(int, int)
 
-    def __init__(self, doss, raster_info, dem, reclass_rules_pente, exokarst, field_exokarst):
+    def __init__(self, doss, raster_info, pP, pR, pI, pKa, carte_p, carte_r, carte_i, carte_ka):
         super().__init__()
         self.raster_info = raster_info
         self.doss = doss
-        self.dem = dem
-        self.reclass_rules_pente = reclass_rules_pente
-        self.exokarst = exokarst
-        self.field_exokarst = field_exokarst
+        self.pP = pP
+        self.pI = pI
+        self.pR = pR
+        self.pKa = pKa
+        self.carte_p = carte_p
+        self.carte_i = carte_i
+        self.carte_ka = carte_ka
+        self.carte_r = carte_r
 
     def run(self):
-        pass
+        try:
+            entries = []
+            LayI = QgsRasterCalculatorEntry()
+            LayI.ref = "LayI@1"
+            LayI.raster = self.carte_i
+            LayI.bandNumber = 1
+            entries.append(LayI)
 
+            LayK = QgsRasterCalculatorEntry()
+            LayK.ref = "LayK@1"
+            LayK.raster = self.carte_ka
+            LayK.bandNumber = 1
+            entries.append(LayK)
+
+            LayR = QgsRasterCalculatorEntry()
+            LayR.ref = "LayR@1"
+            LayR.raster = self.carte_r
+            LayR.bandNumber = 1
+            entries.append(LayR)
+
+            LayP = QgsRasterCalculatorEntry()
+            LayP.ref = "LayP@1"
+            LayP.raster = self.carte_p
+            LayP.bandNumber = 1
+            entries.append(LayP)
+
+            # creation du calcul a realiser
+            Formula = "LayI@1*%s+LayK@1*%s+LayR@1*%s+LayP@1*%s" % (self.pI, self.pKa, self.pR, self.pP)
+            calc = QgsRasterCalculator(Formula, os.path.join(self.doss, 'Carte_Vg.tif'), 'Gtiff', self.carte_i.extent(), self.carte_i.width(),
+                                       self.carte_i.height(), entries)
+            res = calc.processCalculation()
+
+            rCarte_Vg = QgsRasterLayer(os.path.join(self.doss, 'Carte_Vg.tif'), 'Carte_Vg')
+            rules = [-1, 79, 0, 79, 159, 1, 159, 239, 2, 240, 319, 3, 319, 400, 4]
+
+            processing.run("native:reclassifybytable", {'INPUT_RASTER': rCarte_Vg,
+                                                        'RASTER_BAND': 1,
+                                                        'TABLE': rules,
+                                                        'NO_DATA': -9999,
+                                                        'RANGE_BOUNDARIES': 0,
+                                                        'NODATA_FOR_MISSING': False,
+                                                        'DATA_TYPE': 5,
+                                                        'OUTPUT': os.path.join(self.doss, 'Vulnerability_Map.tif')})
+            self.progress.emit(1, 1)
+            self.results.emit()
+        except Exception as e:
+            self.error.emit(Exception('An error happen when generating the Final map: %s' % str(e)))
+        finally:
+            self.finished.emit()
 
 
 
