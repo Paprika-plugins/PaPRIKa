@@ -151,7 +151,7 @@ class WorkerCarteP(QObject):
             raster = None
             self.results.emit()
         except Exception as e:
-            self.error.emit(Exception('Une erreur est survenue lors de la génération de la carte P : %s' % str(e)))
+            self.error.emit(Exception('An error happen when generating the P Factor: %s' % str(e)))
         finally:
             self.finished.emit()
 
@@ -270,7 +270,7 @@ class WorkerCarteR(QObject):
             Raster = None
             self.results.emit()
         except Exception as e:
-            self.error.emit(Exception('Une erreur est survenue lors de la génération de la carte R : %s' % str(e)))
+            self.error.emit(Exception('An error happen when generating the R Factor: %s' % str(e)))
         finally:
             self.finished.emit()
 
@@ -281,38 +281,63 @@ class WorkerCarteI(QObject):
     finished = pyqtSignal()
     progress = pyqtSignal(int, int)
 
-    def __init__(self, doss, raster_info, dem, reclass_rules_pente, exokarst, field_exokarst):
+    def __init__(self, doss, raster_info, dem, reclass_rules_pente, layer_karst_features, field_karst_features):
         super().__init__()
         self.raster_info = raster_info
         self.doss = doss
         self.dem = dem
         self.reclass_rules_pente = reclass_rules_pente
-        self.exokarst = exokarst
-        self.field_exokarst = field_exokarst
+        self.layer_karst_features = layer_karst_features
+        self.field_karst_features = field_karst_features
 
     def run(self):
         try:
-            processing.run("gdalogr:slope", {'INPUT': '',
-                                             'OUTPUT': ''})
+            processing.run("gdal:slope", {'INPUT': self.dem,
+                                             'BAND': 1,
+                                             'SCALE': 1,
+                                             'AS_PERCENT': True,
+                                             'COMPUTE_EDGES': False,
+                                             'ZEVENBERGEN': False,
+                                             'OPTIONS': '',
+                                             'OUTPUT': os.path.join(self.doss, 'rRawSlope.tif')})
+
+            rRawSlope = QgsRasterLayer(os.path.join(self.doss, 'rRawSlope.tif'), 'rRawSlope')
 
             # creation du raster Exokarst si besoin
-            if self.field_exokarst is None:
-                rExokarst = None
+            if self.field_karst_features is None:
+                rKarstFeatures = None
             else:
-                processing.run("gdal:rasterize", {'INPUT': '',
-                                                  'OUTPUT': ''})
+                processing.run("gdal:rasterize", {'INPUT': self.layer_karst_features,
+                                                  'FIELD': self.field_karst_features,
+                                                  'HEIGHT': self.raster_info['resolution_y'],
+                                                  'WIDTH': self.raster_info['resolution_x'],
+                                                  'UNITS': 1,
+                                                  'EXTENT': self.raster_info['extent']['str_extent'],
+                                                  'OUTPUT': os.path.join(self.doss, 'rKarstFeatures.tif')})
 
-            processing.run("grass7:r.reclass", {'INPUT': '',
-                                                'OUTPUT': ''})
+                rKarstFeatures = QgsRasterLayer(os.path.join(self.doss, 'rKarstFeatures.tif'), 'rKarstFeatures')
+
+            processing.run("native:reclassifybytable", {'INPUT_RASTER': rRawSlope,
+                                                        'RASTER_BAND': 1,
+                                                        'TABLE': self.reclass_rules_pente,
+                                                        'NO_DATA': -9999,
+                                                        'RANGE_BOUNDARIES': 0,
+                                                        'NODATA_FOR_MISSING': False,
+                                                        'DATA_TYPE':5,
+                                                        'OUTPUT': os.path.join(self.doss, 'rSlope.tif')})
+
+            rSlope = QgsRasterLayer(os.path.join(self.doss, 'rSlope.tif'), 'rSlope')
 
             # preparation des variables pour le croisement
             val_i = range(0, self.raster_info['size_x'], 1)
             val_j = range(0, self.raster_info['size_y'], 1)
+
             pSlope = rSlope.dataProvider()
-            if rExokarst is None:
-                pExokarst = None
+            if rKarstFeatures is None:
+                pKarstFeatures = None
             else:
-                pExokarst = rExokarst.dataProvider()
+                rKarstFeatures = QgsRasterLayer(os.path.join(self.doss, 'rKarstFeatures.tif'), 'rKarstFeatures')
+                pKarstFeatures = rKarstFeatures.dataProvider()
             ValCarteI = numpy.zeros((self.raster_info['size_y'], self.raster_info['size_x']), numpy.int16)
             # iteration sur les pixels: selection de la valeur la plus faible et ecriture dans l'array
             for j in val_j:
@@ -324,12 +349,16 @@ class WorkerCarteI(QObject):
                         (self.raster_info['extent']['Ymax'] - j * self.raster_info['resolution_y']) - self.raster_info[
                             'resolution_y'] / 2)
                     valSlope, found = pSlope.sample(pos, 1)
-                    if pExokarst is None:
-                        valExokarst = 0
+                    if not found:
+                        valSlope = 6
+                    if pKarstFeatures is None:
+                        valKarstFeatures = 0
                     else:
-                        valExokarst, found = pExokarst.sample(pos, 1)
+                        valKarstFeatures, found = pKarstFeatures.sample(pos, 1)
+                        if not found:
+                            valSlope = 6
 
-                    ValCarteI[j, i] = max([valSlope, valExokarst]) if (valSlope, valExokarst) != (None, None) else 0
+                    ValCarteI[j, i] = max([valSlope, valKarstFeatures]) if (valSlope, valKarstFeatures) != (None, None) else 0
 
             # ecriture du raster a partir de l'array
             raster = gdal.GetDriverByName('Gtiff').Create(str(self.doss) + '/I_factor.tif', self.raster_info['size_x'],
@@ -349,12 +378,12 @@ class WorkerCarteI(QObject):
             Band.SetNoDataValue(6)
 
             # fermeture des connexions
-            rExokarst = None
+            rKarstFeatures = None
             rSlope = None
             Raster = None
             self.results.emit()
         except Exception as e:
-            self.error.emit(Exception('Une erreur est survenue lors de la génération de la carte I : %s' % str(e)))
+            self.error.emit(Exception('An error happen when generating the I Factor: %s' % str(e)))
         finally:
             self.finished.emit()
 
@@ -447,7 +476,7 @@ class WorkerCarteKa(QObject):
             Raster = None
             self.results.emit()
         except Exception as e:
-            self.error.emit(Exception('Une erreur est survenue lors de la génération de la carte Ka : %s' % str(e)))
+            self.error.emit(Exception('An error happen when generating the Ka Factor: %s' % str(e)))
         finally:
             self.finished.emit()
 
