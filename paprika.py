@@ -180,10 +180,16 @@ class Paprika:
         """Cleanup necessary items here when plugin dockwidget is closed"""
         self.dockwidget.closingPlugin.disconnect(self.onClosePlugin)
         self.dockwidget.mMapLayerComboBox_IMPLUVIUM.layerChanged.disconnect(self.update_raster_info)
+        if self.extent_view is not None:
+            self.iface.mapCanvas().scene().removeItem(self.extent_view)
+            self.extent_view = None
         self.pluginIsActive = False
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
+        if self.extent_view is not None:
+            self.iface.mapCanvas().scene().removeItem(self.extent_view)
+            self.extent_view = None
         for action in self.actions:
             self.iface.removePluginMenu(
                 self.tr('&Paprika'),
