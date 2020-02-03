@@ -12,10 +12,23 @@ qgisMinimumVersion= 3.4
 description= Vulnerability mapping of Karst aquifers
 version=2.1
 
-about=Simple and quick way to create vulnerability map and associated thematic maps after PaPRIKa method.
+about=A simple and quick way for karst aquifer vulnerability mapping based on the PaPRIKa method
 
-	PaPRIKa method : French guide (http://infoterre.brgm.fr/rapports/RP-57527-FR.pdf 
-	Application case : http://link.springer.com/article/10.1007/s10040-010-0688-8 
+	* More information about the PaPRIKa method:
+	http://infoterre.brgm.fr/rapports/RP-57527-FR.pdf
+	and the associated QGIS plugin:
+	https://doi.org/10.1111/gwat.12855
+
+	* Examples of application:
+	http://link.springer.com/article/10.1007/s10040-010-0688-8
+	and
+	https://doi.org/10.3390/environments6030039
+
+	* To cite this plugin:
+	Ollivier C., Lecomte Y., Chalikakis K., Mazzilli N., Danquigny C. and Emblanch C., 2019.
+	A QGIS Plugin Based on the PaPRIKa Method for Karst Aquifer Vulnerability Mapping.
+	Groundwater, Wiley, 2019, 57 (2),
+	https://doi.org/10.1111/gwat.12855
 
 tracker=https://github.com/Paprika-plugins/PaPRIKa/issues
 repository=https://github.com/Paprika-plugins/PaPRIKa
@@ -25,12 +38,17 @@ repository=https://github.com/Paprika-plugins/PaPRIKa
 
 # Uncomment the following line and add your changelog:
 changelog=
-	1.0 : first version of plugin on repository.
-    1.1 : Bug fixes and upgrade to fit with 2.18
-    2.1 : Bring compatibility for QGIS3 (old version still ok with QGIS2)
+	1.0 : - First version of plugin on repository.
+    1.1 : - Bug fixes and upgrade to fit with 2.18
+    2.1 : - Bring compatibility for QGIS3 (old version still ok with QGIS2)
+          - Extension layer is not needed anymore
+          - Now use threading to run costly alg in background
+          - Remember last used value (weight and working directory)
+          - Update About
+          - Refactor a lot
 
 # Tags are comma separated with spaces allowed
-tags= PaPRIKa, vector, raster, vulnerability, karst
+tags= PaPRIKa,vector,raster,vulnerability,karst
 
 homepage=https://github.com/Paprika-plugins/PaPRIKa
 category=Plugins
