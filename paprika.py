@@ -213,6 +213,7 @@ class Paprika:
             self.dockwidget.pushButton_lancerCarteKa.clicked.connect(self.carte_ka)
             self.dockwidget.pushButton_lancerCarteFinale.clicked.connect(self.carte_finale)
             self.dockwidget.toolButton_dossier_travail.clicked.connect(self.open_directory)
+            self.dockwidget.lineEdit_dossier_travail.setText(QSettings().value('Paprika_toolbox/current_directory', ''))
             self.dockwidget.pushButton_Apropos.clicked.connect(self.open_a_propos)
 
             # connect to provide cleanup on closing of dockwidget
@@ -274,7 +275,7 @@ class Paprika:
             self.dockwidget.spinBox_PondI.valueChanged.connect(self.calcul_somme_pond)
             self.dockwidget.spinBox_PondKa.valueChanged.connect(self.calcul_somme_pond)
             self.calcul_somme_pond()
-    
+            self.update_raster_info()
 
     def calcul_somme_pond(self):
         P = self.dockwidget.spinBox_PondP.value()
@@ -295,6 +296,7 @@ class Paprika:
                                                      QgsProject.instance().fileName(),
                                                      QFileDialog.ShowDirsOnly)
         self.dockwidget.lineEdit_dossier_travail.setText(str(QtCore.QDir.toNativeSeparators(directory)))
+        QSettings().setValue('Paprika_toolbox/current_directory', str(QtCore.QDir.toNativeSeparators(directory)))
     
     def update_raster_info(self):
         """Get raster extent and resolution from impluvium user choice and save it in the instance for use"""
