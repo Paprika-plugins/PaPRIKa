@@ -237,6 +237,7 @@ class Paprika:
         
             # peuplement des ComboBox des champs et gestion des criteres optionnels
             self.dockwidget.mMapLayerComboBox_IMPLUVIUM.layerChanged.connect(self.update_raster_info)
+            self.dockwidget.cb_show_extent.toggled.connect(self.on_show_extent)
                 #SOL
             self.dockwidget.mFieldComboBox_SOL.setFilters(QgsFieldProxyModel.Numeric)
             self.dockwidget.mFieldComboBox_SOL.setLayer(self.dockwidget.mMapLayerComboBox_SOL.currentLayer())
@@ -258,10 +259,15 @@ class Paprika:
             self.dockwidget.mFieldComboBox_OBJETS_EXOKARSTIQUES.setLayer(self.dockwidget.mMapLayerComboBox_OBJETS_EXOKARSTIQUES.currentLayer())
             self.dockwidget.mMapLayerComboBox_OBJETS_EXOKARSTIQUES.layerChanged.connect(self.dockwidget.mFieldComboBox_OBJETS_EXOKARSTIQUES.setLayer)
             # mise a jour du total de la ponderation (Final Map)
+            self.dockwidget.spinBox_PondP.setValue(int(QSettings().value('Paprika_toolbox/pondP', 25)))
+            self.dockwidget.spinBox_PondR.setValue(int(QSettings().value('Paprika_toolbox/pondR', 20)))
+            self.dockwidget.spinBox_PondI.setValue(int(QSettings().value('Paprika_toolbox/pondI', 30)))
+            self.dockwidget.spinBox_PondKa.setValue(int(QSettings().value('Paprika_toolbox/pondKa', 25)))
             self.dockwidget.spinBox_PondP.valueChanged.connect(self.calcul_somme_pond)
             self.dockwidget.spinBox_PondR.valueChanged.connect(self.calcul_somme_pond)
             self.dockwidget.spinBox_PondI.valueChanged.connect(self.calcul_somme_pond)
             self.dockwidget.spinBox_PondKa.valueChanged.connect(self.calcul_somme_pond)
+            self.calcul_somme_pond()
     
 
     def calcul_somme_pond(self):
@@ -305,13 +311,28 @@ class Paprika:
             self.raster_info['extent']['str_extent'] = ', '.join([str(Xmin), str(Xmax), str(Ymax), str(Ymin)])
             self.raster_info['size_x'] = int(abs(Xmax - Xmin)/self.raster_info['resolution_x'])
             self.raster_info['size_y'] = int(abs(Ymax - Ymin)/self.raster_info['resolution_y'])
+            if self.dockwidget.cb_show_extent.isChecked():
+                if self.extent_view is not None:
+                    self.iface.mapCanvas().scene().removeItem(self.extent_view)
+                    self.extent_view = QgsRubberBand(self.iface.mapCanvas())
+                    self.extent_view.addGeometry(QgsGeometry.fromRect(QgsRectangle(Xmin, Ymin, Xmax, Ymax)))
+                    self.extent_view.setColor(QColor('#A43C27'))
+                else:
+                    self.extent_view = QgsRubberBand(self.iface.mapCanvas())
+                    self.extent_view.addGeometry(QgsGeometry.fromRect(QgsRectangle(Xmin, Ymin, Xmax, Ymax)))
+                    self.extent_view.setColor(QColor('#A43C27'))
+
+    def on_show_extent(self):
+        if self.dockwidget.cb_show_extent.isChecked():
+            if 'extent' in self.raster_info:
+                corner = self.raster_info['extent']
+                self.extent_view = QgsRubberBand(self.iface.mapCanvas())
+                self.extent_view.addGeometry(QgsGeometry.fromRect(QgsRectangle(corner['Xmin'], corner['Ymin'], corner['Xmax'], corner['Ymax'])))
+                self.extent_view.setColor(QColor('#A43C27'))
+        else:
             if self.extent_view is not None:
                 self.iface.mapCanvas().scene().removeItem(self.extent_view)
                 self.extent_view = None
-            else:
-                self.extent_view = QgsRubberBand(self.iface.mapCanvas())
-                self.extent_view.addGeometry(QgsGeometry.fromRect(QgsRectangle(Xmin, Ymin, Xmax, Ymax)))
-                self.extent_view.setColor(QColor('#A43C27'))
 
     def carte_p(self):
         """test les parametres et lance la generation de la carte P"""
@@ -531,6 +552,11 @@ class Paprika:
         pR=self.dockwidget.spinBox_PondR.value()
         pI=self.dockwidget.spinBox_PondI.value()
         pKa=self.dockwidget.spinBox_PondKa.value()
+        QSettings().setValue('Paprika_toolbox/pondP', pP)
+        QSettings().setValue('Paprika_toolbox/pondR', pR)
+        QSettings().setValue('Paprika_toolbox/pondI', pI)
+        QSettings().setValue('Paprika_toolbox/pondKa', pKa)
+
         if pI + pKa + pP + pR != 100:
             return self.showdialog('weight sum must be egal at 100%!', 'invalid weight...')
             
