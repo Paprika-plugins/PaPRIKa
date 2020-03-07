@@ -286,31 +286,34 @@ class Paprika:
     
     def update_raster_info(self):
         """stocke la taille et la resolution des rasters à générer"""
-        self.raster_info['resolution_x'] = self.dockwidget.spb_resolution.value()
-        self.raster_info['resolution_y'] = self.dockwidget.spb_resolution.value()
-        layer_impluvium = self.dockwidget.mMapLayerComboBox_IMPLUVIUM.currentLayer()
-        self.raster_info['projection_wkt'] = layer_impluvium.crs().toWkt()
-        feature_impluvium = next(layer_impluvium.getFeatures())
-        geom = feature_impluvium.geometry().buffer(1000, 5).boundingBox()
-        Xmin = geom.xMinimum()
-        Ymin = geom.yMinimum()
-        Xmax = geom.xMaximum()
-        Ymax = geom.yMaximum()
-        self.raster_info['extent'] = {}
-        self.raster_info['extent']['Xmin'] = Xmin
-        self.raster_info['extent']['Ymin'] = Ymin
-        self.raster_info['extent']['Xmax'] = Xmax
-        self.raster_info['extent']['Ymax'] = Ymax
-        self.raster_info['extent']['str_extent'] = ', '.join([str(Xmin), str(Xmax), str(Ymax), str(Ymin)])
-        self.raster_info['size_x'] = int(abs(Xmax - Xmin)/self.raster_info['resolution_x'])
-        self.raster_info['size_y'] = int(abs(Ymax - Ymin)/self.raster_info['resolution_y'])
-        if self.extent_view is not None:
-            self.iface.mapCanvas().scene().removeItem(self.extent_view)
-            self.extent_view = None
+        if not self.dockwidget.mMapLayerComboBox_IMPLUVIUM.currentLayer().isValid():
+            return
         else:
-            self.extent_view = QgsRubberBand(self.iface.mapCanvas())
-            self.extent_view.addGeometry(QgsGeometry.fromRect(QgsRectangle(Xmin, Ymin, Xmax, Ymax)))
-            self.extent_view.setColor(QColor('#A43C27'))
+            self.raster_info['resolution_x'] = self.dockwidget.spb_resolution.value()
+            self.raster_info['resolution_y'] = self.dockwidget.spb_resolution.value()
+            layer_impluvium = self.dockwidget.mMapLayerComboBox_IMPLUVIUM.currentLayer()
+            self.raster_info['projection_wkt'] = layer_impluvium.crs().toWkt()
+            feature_impluvium = next(layer_impluvium.getFeatures())
+            geom = feature_impluvium.geometry().buffer(1000, 5).boundingBox()
+            Xmin = geom.xMinimum()
+            Ymin = geom.yMinimum()
+            Xmax = geom.xMaximum()
+            Ymax = geom.yMaximum()
+            self.raster_info['extent'] = {}
+            self.raster_info['extent']['Xmin'] = Xmin
+            self.raster_info['extent']['Ymin'] = Ymin
+            self.raster_info['extent']['Xmax'] = Xmax
+            self.raster_info['extent']['Ymax'] = Ymax
+            self.raster_info['extent']['str_extent'] = ', '.join([str(Xmin), str(Xmax), str(Ymax), str(Ymin)])
+            self.raster_info['size_x'] = int(abs(Xmax - Xmin)/self.raster_info['resolution_x'])
+            self.raster_info['size_y'] = int(abs(Ymax - Ymin)/self.raster_info['resolution_y'])
+            if self.extent_view is not None:
+                self.iface.mapCanvas().scene().removeItem(self.extent_view)
+                self.extent_view = None
+            else:
+                self.extent_view = QgsRubberBand(self.iface.mapCanvas())
+                self.extent_view.addGeometry(QgsGeometry.fromRect(QgsRectangle(Xmin, Ymin, Xmax, Ymax)))
+                self.extent_view.setColor(QColor('#A43C27'))
 
     def carte_p(self):
         """test les parametres et lance la generation de la carte P"""
