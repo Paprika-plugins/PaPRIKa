@@ -169,24 +169,30 @@ class Paprika:
 
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
-
         icon_path = os.path.join(BASE_DIR, 'icon.png')
         self.add_action(
             icon_path,
-            text=self.tr(u'Paprika Toolbox'),
+            text=self.tr('Paprika Toolbox'),
             callback=self.run,
             parent=self.iface.mainWindow())
 
     def onClosePlugin(self):
         """Cleanup necessary items here when plugin dockwidget is closed"""
         self.dockwidget.closingPlugin.disconnect(self.onClosePlugin)
+        self.dockwidget.mMapLayerComboBox_IMPLUVIUM.layerChanged.disconnect(self.update_raster_info)
+        if self.extent_view is not None:
+            self.iface.mapCanvas().scene().removeItem(self.extent_view)
+            self.extent_view = None
         self.pluginIsActive = False
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
+        if self.extent_view is not None:
+            self.iface.mapCanvas().scene().removeItem(self.extent_view)
+            self.extent_view = None
         for action in self.actions:
             self.iface.removePluginMenu(
-                self.tr(u'&Paprika'),
+                self.tr('&Paprika'),
                 action)
             self.iface.removeToolBarIcon(action)
         del self.toolbar
@@ -207,6 +213,7 @@ class Paprika:
             self.dockwidget.pushButton_lancerCarteKa.clicked.connect(self.carte_ka)
             self.dockwidget.pushButton_lancerCarteFinale.clicked.connect(self.carte_finale)
             self.dockwidget.toolButton_dossier_travail.clicked.connect(self.open_directory)
+            self.dockwidget.lineEdit_dossier_travail.setText(QSettings().value('Paprika_toolbox/current_directory', ''))
             self.dockwidget.pushButton_Apropos.clicked.connect(self.open_a_propos)
 
             # connect to provide cleanup on closing of dockwidget
@@ -233,10 +240,11 @@ class Paprika:
             
             # peuplement de la comboBox du critere de Mangin
             self.dockwidget.comboBox_MANGIN.clear()
-            self.dockwidget.comboBox_MANGIN.addItems(['1','2','3','4']) 
+            self.dockwidget.comboBox_MANGIN.addItems(['1', '2', '3', '4'])
         
             # peuplement des ComboBox des champs et gestion des criteres optionnels
             self.dockwidget.mMapLayerComboBox_IMPLUVIUM.layerChanged.connect(self.update_raster_info)
+            self.dockwidget.cb_show_extent.toggled.connect(self.on_show_extent)
                 #SOL
             self.dockwidget.mFieldComboBox_SOL.setFilters(QgsFieldProxyModel.Numeric)
             self.dockwidget.mFieldComboBox_SOL.setLayer(self.dockwidget.mMapLayerComboBox_SOL.currentLayer())
@@ -258,11 +266,16 @@ class Paprika:
             self.dockwidget.mFieldComboBox_OBJETS_EXOKARSTIQUES.setLayer(self.dockwidget.mMapLayerComboBox_OBJETS_EXOKARSTIQUES.currentLayer())
             self.dockwidget.mMapLayerComboBox_OBJETS_EXOKARSTIQUES.layerChanged.connect(self.dockwidget.mFieldComboBox_OBJETS_EXOKARSTIQUES.setLayer)
             # mise a jour du total de la ponderation (Final Map)
+            self.dockwidget.spinBox_PondP.setValue(int(QSettings().value('Paprika_toolbox/pondP', 25)))
+            self.dockwidget.spinBox_PondR.setValue(int(QSettings().value('Paprika_toolbox/pondR', 20)))
+            self.dockwidget.spinBox_PondI.setValue(int(QSettings().value('Paprika_toolbox/pondI', 30)))
+            self.dockwidget.spinBox_PondKa.setValue(int(QSettings().value('Paprika_toolbox/pondKa', 25)))
             self.dockwidget.spinBox_PondP.valueChanged.connect(self.calcul_somme_pond)
             self.dockwidget.spinBox_PondR.valueChanged.connect(self.calcul_somme_pond)
             self.dockwidget.spinBox_PondI.valueChanged.connect(self.calcul_somme_pond)
             self.dockwidget.spinBox_PondKa.valueChanged.connect(self.calcul_somme_pond)
-    
+            self.calcul_somme_pond()
+            self.update_raster_info()
 
     def calcul_somme_pond(self):
         P = self.dockwidget.spinBox_PondP.value()
@@ -277,21 +290,20 @@ class Paprika:
             self.dockwidget.pushButton_lancerCarteFinale.setEnabled(False)
 
     def open_directory(self):
-        """permet a l'utilisateur de choisir son repertoire de travail"""
+        """choose a directory to save the generated files"""
         directory = QFileDialog.getExistingDirectory(self.dockwidget.toolButton_dossier_travail,
-                                                     "Sélectionner le répertoire de travail",
+                                                     "Choose a directory to work with",
                                                      QgsProject.instance().fileName(),
                                                      QFileDialog.ShowDirsOnly)
         self.dockwidget.lineEdit_dossier_travail.setText(str(QtCore.QDir.toNativeSeparators(directory)))
-    
+        QSettings().setValue('Paprika_toolbox/current_directory', str(QtCore.QDir.toNativeSeparators(directory)))
+
     def update_raster_info(self):
-        """stocke la taille et la resolution des rasters à générer"""
-        if not self.dockwidget.mMapLayerComboBox_IMPLUVIUM.currentLayer().isValid():
-            return
-        else:
-            self.raster_info['resolution_x'] = self.dockwidget.spb_resolution.value()
-            self.raster_info['resolution_y'] = self.dockwidget.spb_resolution.value()
-            layer_impluvium = self.dockwidget.mMapLayerComboBox_IMPLUVIUM.currentLayer()
+        """Get raster extent and resolution from impluvium user choice and save it in the instance for use"""
+        self.raster_info['resolution_x'] = self.dockwidget.spb_resolution.value()
+        self.raster_info['resolution_y'] = self.dockwidget.spb_resolution.value()
+        layer_impluvium = self.dockwidget.mMapLayerComboBox_IMPLUVIUM.currentLayer()
+        if layer_impluvium and layer_impluvium.isValid():
             self.raster_info['projection_wkt'] = layer_impluvium.crs().toWkt()
             feature_impluvium = next(layer_impluvium.getFeatures())
             geom = feature_impluvium.geometry().buffer(1000, 5).boundingBox()
@@ -307,13 +319,28 @@ class Paprika:
             self.raster_info['extent']['str_extent'] = ', '.join([str(Xmin), str(Xmax), str(Ymax), str(Ymin)])
             self.raster_info['size_x'] = int(abs(Xmax - Xmin)/self.raster_info['resolution_x'])
             self.raster_info['size_y'] = int(abs(Ymax - Ymin)/self.raster_info['resolution_y'])
+            if self.dockwidget.cb_show_extent.isChecked():
+                if self.extent_view is not None:
+                    self.iface.mapCanvas().scene().removeItem(self.extent_view)
+                    self.extent_view = QgsRubberBand(self.iface.mapCanvas())
+                    self.extent_view.addGeometry(QgsGeometry.fromRect(QgsRectangle(Xmin, Ymin, Xmax, Ymax)))
+                    self.extent_view.setColor(QColor('#A43C27'))
+                else:
+                    self.extent_view = QgsRubberBand(self.iface.mapCanvas())
+                    self.extent_view.addGeometry(QgsGeometry.fromRect(QgsRectangle(Xmin, Ymin, Xmax, Ymax)))
+                    self.extent_view.setColor(QColor('#A43C27'))
+
+    def on_show_extent(self):
+        if self.dockwidget.cb_show_extent.isChecked():
+            if 'extent' in self.raster_info:
+                corner = self.raster_info['extent']
+                self.extent_view = QgsRubberBand(self.iface.mapCanvas())
+                self.extent_view.addGeometry(QgsGeometry.fromRect(QgsRectangle(corner['Xmin'], corner['Ymin'], corner['Xmax'], corner['Ymax'])))
+                self.extent_view.setColor(QColor('#A43C27'))
+        else:
             if self.extent_view is not None:
                 self.iface.mapCanvas().scene().removeItem(self.extent_view)
                 self.extent_view = None
-            else:
-                self.extent_view = QgsRubberBand(self.iface.mapCanvas())
-                self.extent_view.addGeometry(QgsGeometry.fromRect(QgsRectangle(Xmin, Ymin, Xmax, Ymax)))
-                self.extent_view.setColor(QColor('#A43C27'))
 
     def carte_p(self):
         """test les parametres et lance la generation de la carte P"""
@@ -442,14 +469,14 @@ class Paprika:
     def carte_i(self):
         """teste les parametres et lance la generation de la carte I"""
         if self.dockwidget.checkBox_OBJETS_EXOKARSTIQUES.isChecked():
-            if self.dockwidget.mFieldComboBox_OBJETS_EXOKARSTIQUES.currentField() == u'':
+            if self.dockwidget.mFieldComboBox_OBJETS_EXOKARSTIQUES.currentField() == '':
                 return self.showdialog('The index Field of Karst features Layer is not set...', 'Field issue...')
 
             value_objets_exokarstiques = [feature.attribute(self.dockwidget.mFieldComboBox_OBJETS_EXOKARSTIQUES.currentField()) for feature in self.dockwidget.mMapLayerComboBox_OBJETS_EXOKARSTIQUES.currentLayer().getFeatures()]
             if min(value_objets_exokarstiques) < 0 or max(value_objets_exokarstiques) > 4 :
                 return self.showdialog('The index Field of Karst features Layer has wrong value... (not between 0 and 4 or null)', 'Index issue...')
 
-        self.generate_reclass_rules_slope(self.dockwidget.spinBox_first_threshold.value(),self.dockwidget.spinBox_second_threshold.value(),self.dockwidget.spinBox_third_threshold.value())
+        rules = self.generate_reclass_rules_slope(self.dockwidget.spinBox_first_threshold.value(),self.dockwidget.spinBox_second_threshold.value(),self.dockwidget.spinBox_third_threshold.value())
         pente = self.dockwidget.mMapLayerComboBox_PENTE.currentLayer()
 
         if self.dockwidget.checkBox_OBJETS_EXOKARSTIQUES.isChecked():
@@ -462,20 +489,34 @@ class Paprika:
         for lyr in QgsProject.instance().mapLayers().values():
             if lyr.name() == "I Factor": 
                 QgsProject.instance().removeMapLayers( [lyr.id()] )
-                
-        Carte_I.genere_carteI(self.dockwidget.lineEdit_dossier_travail.text(),
+
+        self.carte_i_worker = WorkerCarteI(self.dockwidget.lineEdit_dossier_travail.text(),
                                 self.raster_info,
                                 pente,
-                                os.path.dirname(os.path.abspath(__file__))+'/reclass_rules/reclass_rules_slope.txt',
+                                rules,
                                 exokarst,
                                 field_exokarst)
-            
-        #genere le style et charge le tif dans QGIS
-        lay_carteI = QgsRasterLayer(str(self.dockwidget.lineEdit_dossier_travail.text())+'/I_factor.tif','I factor')
+        self.carte_i_thread = QThread()
+        self.carte_i_worker.results.connect(self.on_carte_i_results)
+        self.carte_i_worker.progress.connect(self.on_progress)
+        self.carte_i_worker.error.connect(self.on_error)
+        self.carte_i_worker.finished.connect(self.on_carte_i_finished)
+
+        self.carte_i_worker.moveToThread(self.carte_i_thread)
+        self.carte_i_thread.started.connect(self.carte_i_worker.run)
+        self.carte_i_thread.start()
+
+    def on_carte_i_results(self):
+        lay_carteI = QgsRasterLayer(str(self.dockwidget.lineEdit_dossier_travail.text())+'/I_factor.tif', 'I factor')
+
         self.set_raster_style(lay_carteI)
         QgsProject.instance().addMapLayer(lay_carteI)
         self.showdialog('I factor map created wih success!', 'Well done!')
-        
+
+    def on_carte_i_finished(self):
+        self.carte_i_thread.quit()
+        self.carte_i_thread.wait()
+
     def carte_ka(self):
         """teste les parametres et lance la generation de la carte Ka"""
         if self.dockwidget.checkBox_KARST_FEATURES.isChecked():
@@ -488,24 +529,42 @@ class Paprika:
         for lyr in QgsProject.instance().mapLayers().values():
             if lyr.name() == "Ka factor": 
                 QgsProject.instance().removeMapLayers([lyr.id()])
-                
-        Carte_Ka.genere_carteKa(int(self.dockwidget.comboBox_MANGIN.currentText()),
-                                karst_features,
+
+        self.carte_ka_worker = WorkerCarteKa(self.dockwidget.lineEdit_dossier_travail.text(),
                                 self.raster_info,
-                                self.dockwidget.lineEdit_dossier_travail.text())
-                                
-        #genere le style et charge le tif dans QGIS
+                                int(self.dockwidget.comboBox_MANGIN.currentText()),
+                                karst_features)
+
+        self.carte_ka_thread = QThread()
+        self.carte_ka_worker.results.connect(self.on_carte_ka_results)
+        self.carte_ka_worker.progress.connect(self.on_progress)
+        self.carte_ka_worker.error.connect(self.on_error)
+        self.carte_ka_worker.finished.connect(self.on_carte_ka_finished)
+
+        self.carte_ka_worker.moveToThread(self.carte_ka_thread)
+        self.carte_ka_thread.started.connect(self.carte_ka_worker.run)
+        self.carte_ka_thread.start()
+
+    def on_carte_ka_results(self):
         lay_carteKa = QgsRasterLayer(str(self.dockwidget.lineEdit_dossier_travail.text())+'/Ka_factor.tif','Ka factor')
         self.set_raster_style(lay_carteKa)
         QgsProject.instance().addMapLayer(lay_carteKa)
         self.showdialog('Ka factor map created wih success!', 'Well done!')
-    
+
+    def on_carte_ka_finished(self):
+        self.carte_ka_thread.quit()
+        self.carte_ka_thread.wait()
+
     def carte_finale(self):
-        #verifie la ponderation
         pP=self.dockwidget.spinBox_PondP.value()
         pR=self.dockwidget.spinBox_PondR.value()
         pI=self.dockwidget.spinBox_PondI.value()
         pKa=self.dockwidget.spinBox_PondKa.value()
+        QSettings().setValue('Paprika_toolbox/pondP', pP)
+        QSettings().setValue('Paprika_toolbox/pondR', pR)
+        QSettings().setValue('Paprika_toolbox/pondI', pI)
+        QSettings().setValue('Paprika_toolbox/pondKa', pKa)
+
         if pI + pKa + pP + pR != 100:
             return self.showdialog('weight sum must be egal at 100%!', 'invalid weight...')
             
@@ -513,33 +572,49 @@ class Paprika:
         for lyr in QgsProject.instance().mapLayers().values():
             if lyr.name() == "Vulnerability Map": 
                 QgsProject.instance().removeMapLayers( [lyr.id()] )
-                
-        Carte_Finale.genere_carteFinale(self.dockwidget.spinBox_PondP.value(),
+
+        self.carte_finale_worker = WorkerCarteFinale(self.dockwidget.lineEdit_dossier_travail.text(),
+                                        self.raster_info,
+                                        self.dockwidget.spinBox_PondP.value(),
                                         self.dockwidget.spinBox_PondR.value(),
                                         self.dockwidget.spinBox_PondI.value(),
                                         self.dockwidget.spinBox_PondKa.value(),
                                         self.dockwidget.mMapLayerComboBox_CartePF.currentLayer(),
                                         self.dockwidget.mMapLayerComboBox_CarteRF.currentLayer(),
                                         self.dockwidget.mMapLayerComboBox_CarteIF.currentLayer(),
-                                        self.dockwidget.mMapLayerComboBox_CarteKaF.currentLayer(),
-                                        self.dockwidget.lineEdit_dossier_travail.text(),
-                                        self.raster_info)
-                                        
-        #genere le style et charge le tif dans QGIS
+                                        self.dockwidget.mMapLayerComboBox_CarteKaF.currentLayer())
+
+        self.carte_finale_thread = QThread()
+        self.carte_finale_worker.results.connect(self.on_carte_finale_results)
+        self.carte_finale_worker.progress.connect(self.on_progress)
+        self.carte_finale_worker.error.connect(self.on_error)
+        self.carte_finale_worker.finished.connect(self.on_carte_finale_finished)
+
+        self.carte_finale_worker.moveToThread(self.carte_finale_thread)
+        self.carte_finale_thread.started.connect(self.carte_finale_worker.run)
+        self.carte_finale_thread.start()
+
+    def on_carte_finale_results(self):
         lay_carteFinale = QgsRasterLayer(str(self.dockwidget.lineEdit_dossier_travail.text())+'/Vulnerability_Map.tif','Vulnerability Map')
         self.set_raster_style(lay_carteFinale)
         QgsProject.instance().addMapLayer(lay_carteFinale)
         return self.showdialog('Final map created wih success!', 'Well done!')
 
+    def on_carte_finale_finished(self):
+        self.carte_finale_thread.quit()
+        self.carte_finale_thread.wait()
+
     def on_error(self, e):
+        """If something wrong happen in the thread, show what..."""
         self.showdialog(str(e), 'Oups!')
 
     def on_progress(self, value, tot):
+        """Update the progress bar from thread"""
         self.dockwidget.progress.setMaximum(100)
         self.dockwidget.progress.setValue((value*100/tot) + 1)
     
     def showdialog (self, text, title):
-        """fonction permettant d'afficher des messages a l'utilisateur"""
+        """Just a wrapper to show message popup to user"""
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Warning)
         msg.setText(text)
@@ -548,6 +623,7 @@ class Paprika:
         msg.exec_()
 
     def set_raster_style(self, raster_layer):
+        """Set the style for output"""
         s = QgsRasterShader()
         c = QgsColorRampShader()
         c.setColorRampType(QgsColorRampShader.Exact)
@@ -564,27 +640,22 @@ class Paprika:
         raster_layer.setRenderer(ps)
     
     def open_a_propos(self):
-        """fonction d'ouverture de la fenetre A propos, connectee a son PushButton"""
+        """Open About dialog"""
         a_propos = Ui_A_propos()
         a_propos.exec()
     
     def download_methodo(self):
-        """fonction d'ouverture de la methodologie officielle PaPRIKa"""
+        """Open webbrowser on official methodology page"""
         webbrowser.open_new('http://infoterre.brgm.fr/rapports/RP-57527-FR.pdf')
         webbrowser.open_new_tab('http://link.springer.com/article/10.1007/s10040-010-0688-8')
     
     def open_help(self):
-        """fonction d'ouverture de la documentation du plugin"""
+        """Open pdf docs. Platform dependent"""
         if os.name == 'nt':
             os.startfile(os.path.dirname(os.path.abspath(__file__))+'/doc/Paprika_Toolbox_User_guide.pdf')
         elif os.name == 'posix':
             subprocess.call(["xdg-open", os.path.dirname(os.path.abspath(__file__))+'/doc/Paprika_Toolbox_User_guide.pdf'])
     
     def generate_reclass_rules_slope(self,first,second,third):
-        """fonction de generation du fichier .txt des regles de reclassement de la pente, le fichier est genere dans le repertoire du plugin"""
-        reclass_rules = open(os.path.dirname(os.path.abspath(__file__))+'/reclass_rules/reclass_rules_slope.txt', 'w')
-        reclass_rules.write('0 thru ' + str(first) + '= 4\n')
-        reclass_rules.write(str(first) + ' thru ' + str(second) + '= 3\n')
-        reclass_rules.write(str(second) + ' thru ' + str(third) + '= 2\n')
-        reclass_rules.write(str(third) + ' thru 9999999' + '= 1')
-        reclass_rules.close()
+        """Generate the list that contains rules for slope reclassify"""
+        return [-1, first, 4, first, second, 3, second, third, 2, third, 99999999, 1]
