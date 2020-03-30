@@ -650,11 +650,8 @@ class Paprika:
         webbrowser.open_new_tab('http://link.springer.com/article/10.1007/s10040-010-0688-8')
     
     def open_help(self):
-        """Open pdf docs. Platform dependent"""
-        if os.name == 'nt':
-            os.startfile(os.path.dirname(os.path.abspath(__file__))+'/doc/Paprika_Toolbox_User_guide.pdf')
-        elif os.name == 'posix':
-            subprocess.call(["xdg-open", os.path.dirname(os.path.abspath(__file__))+'/doc/Paprika_Toolbox_User_guide.pdf'])
+        """Open online docs"""
+        webbrowser.open_new('https://paprika-docs.readthedocs.io/en/stable/index.html')
     
     def generate_reclass_rules_slope(self,first,second,third):
         """Generate the list that contains rules for slope reclassify"""
