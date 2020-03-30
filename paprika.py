@@ -297,7 +297,7 @@ class Paprika:
                                                      QFileDialog.ShowDirsOnly)
         self.dockwidget.lineEdit_dossier_travail.setText(str(QtCore.QDir.toNativeSeparators(directory)))
         QSettings().setValue('Paprika_toolbox/current_directory', str(QtCore.QDir.toNativeSeparators(directory)))
-    
+
     def update_raster_info(self):
         """Get raster extent and resolution from impluvium user choice and save it in the instance for use"""
         self.raster_info['resolution_x'] = self.dockwidget.spb_resolution.value()
@@ -554,7 +554,7 @@ class Paprika:
     def on_carte_ka_finished(self):
         self.carte_ka_thread.quit()
         self.carte_ka_thread.wait()
-    
+
     def carte_finale(self):
         pP=self.dockwidget.spinBox_PondP.value()
         pR=self.dockwidget.spinBox_PondR.value()
