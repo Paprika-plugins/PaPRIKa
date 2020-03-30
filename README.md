@@ -1,4 +1,7 @@
 # PaPRIKa Toolbox
+
+[![Documentation Status](https://readthedocs.org/projects/paprika-docs/badge/?version=latest)](https://paprika-docs.readthedocs.io/en/latest/?badge=latest)
+
 The PaPRIKa toolbox is develop after vulnerability mapping [PaPRIKa method](http://infoterre.brgm.fr/rapports/RP-57527-FR.pdf). This method is dedicated to karst aquifers and it is the last released French method update from EPIK and RISKE methods develop by Dörfliger and Plagnes in 2009.
 
 Due to their high degree of heterogeneity, Karst vulnerability mapping is a challenging task. It’s need hydrogeological expertise, and this is not providing by the plugin! Fortunately, the PaPRIKa method guide provides advice and rules to help you. The PaPRIKa toolbox help you to follow a clear workflow for create the four thematic maps: protection, infiltration, karst development and reservoir, used to calculate the vulnerability index. You can use the toolbox for both source or intrinsic vulnerability mapping, because that depend on your analyses !
