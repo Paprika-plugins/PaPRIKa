@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import os
 import numpy
-import gdal
 import processing
+from osgeo import gdal
 from qgis.core import QgsRasterLayer, QgsPointXY, QgsField
 from qgis.analysis import QgsRasterCalculator, QgsRasterCalculatorEntry
 from PyQt5.QtCore import QObject, pyqtSignal, QVariant
