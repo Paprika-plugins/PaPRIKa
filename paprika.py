@@ -420,6 +420,8 @@ class Paprika:
     def on_carte_p_finished(self):
         self.carte_p_thread.quit()
         self.carte_p_thread.wait()
+        self.carte_p_worker = None
+        self.carte_p_thread = None
 
     def carte_r(self):
         """teste les parametres et lance la generation de la carte R"""
@@ -463,9 +465,11 @@ class Paprika:
         self.showdialog('R factor map created wih success!', 'Well done!')
 
     def on_carte_r_finished(self):
-        self.carte_p_thread.quit()
-        self.carte_p_thread.wait()
-            
+        self.carte_r_thread.quit()
+        self.carte_r_thread.wait()
+        self.carte_r_worker = None
+        self.carte_r_thread = None
+  
     def carte_i(self):
         """teste les parametres et lance la generation de la carte I"""
         if self.dockwidget.checkBox_OBJETS_EXOKARSTIQUES.isChecked():
@@ -516,6 +520,8 @@ class Paprika:
     def on_carte_i_finished(self):
         self.carte_i_thread.quit()
         self.carte_i_thread.wait()
+        self.carte_i_worker = None
+        self.carte_i_thread = None
 
     def carte_ka(self):
         """teste les parametres et lance la generation de la carte Ka"""
@@ -554,6 +560,8 @@ class Paprika:
     def on_carte_ka_finished(self):
         self.carte_ka_thread.quit()
         self.carte_ka_thread.wait()
+        self.carte_ka_worker = None
+        self.carte_ka_thread = None
     
     def carte_finale(self):
         pP=self.dockwidget.spinBox_PondP.value()
