@@ -297,7 +297,7 @@ class Paprika:
                                                      QFileDialog.ShowDirsOnly)
         self.dockwidget.lineEdit_dossier_travail.setText(str(QtCore.QDir.toNativeSeparators(directory)))
         QSettings().setValue('Paprika_toolbox/current_directory', str(QtCore.QDir.toNativeSeparators(directory)))
-    
+
     def update_raster_info(self):
         """Get raster extent and resolution from impluvium user choice and save it in the instance for use"""
         self.raster_info['resolution_x'] = self.dockwidget.spb_resolution.value()
@@ -469,7 +469,7 @@ class Paprika:
         self.carte_r_thread.wait()
         self.carte_r_worker = None
         self.carte_r_thread = None
-  
+
     def carte_i(self):
         """teste les parametres et lance la generation de la carte I"""
         if self.dockwidget.checkBox_OBJETS_EXOKARSTIQUES.isChecked():
@@ -562,7 +562,7 @@ class Paprika:
         self.carte_ka_thread.wait()
         self.carte_ka_worker = None
         self.carte_ka_thread = None
-    
+
     def carte_finale(self):
         pP=self.dockwidget.spinBox_PondP.value()
         pR=self.dockwidget.spinBox_PondR.value()
@@ -658,11 +658,8 @@ class Paprika:
         webbrowser.open_new_tab('http://link.springer.com/article/10.1007/s10040-010-0688-8')
     
     def open_help(self):
-        """Open pdf docs. Platform dependent"""
-        if os.name == 'nt':
-            os.startfile(os.path.dirname(os.path.abspath(__file__))+'/doc/Paprika_Toolbox_User_guide.pdf')
-        elif os.name == 'posix':
-            subprocess.call(["xdg-open", os.path.dirname(os.path.abspath(__file__))+'/doc/Paprika_Toolbox_User_guide.pdf'])
+        """Open online docs"""
+        webbrowser.open_new('https://paprika-docs.readthedocs.io/en/stable/index.html')
     
     def generate_reclass_rules_slope(self,first,second,third):
         """Generate the list that contains rules for slope reclassify"""
