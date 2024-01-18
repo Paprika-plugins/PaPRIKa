@@ -272,7 +272,7 @@
             </font>
            </property>
            <property name="text">
-            <string>&lt;a href=&quot;mailto:ylecomte@sig.eu.com,yoann_lecomte31@orange.fr?subject=Plugin Paprika&quot; style=&quot;color:#2E2EFE;text-decoration:none;&quot;&gt;&lt;U&gt;Yoann Lecomte&lt;/U&gt;&lt;/a&gt;</string>
+            <string>&lt;a href=&quot;mailto:yoann.cartyl@gmail.com?subject=Plugin Paprika&quot; style=&quot;color:#2E2EFE;text-decoration:none;&quot;&gt;&lt;U&gt;Yoann Lecomte&lt;/U&gt;&lt;/a&gt;</string>
            </property>
            <property name="openExternalLinks">
             <bool>true</bool>
@@ -318,7 +318,7 @@
                </font>
               </property>
               <property name="text">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://cartyl.fr&quot;&gt;&lt;span style=&quot; color:#000000;&quot;&gt;Yoann LECOMTE - CARTYL&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://www.linkedin.com/in/yoannlecomte/&quot;&gt;&lt;span style=&quot; color:#000000;&quot;&gt;Yoann LECOMTE - CARTYL&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignCenter</set>

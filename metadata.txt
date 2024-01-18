@@ -10,7 +10,7 @@
 name= PaPRIKa Toolbox
 qgisMinimumVersion= 3.4
 description= Vulnerability mapping of Karst aquifers
-version=2.1
+version=2.2
 
 about=A simple and quick way for karst aquifer vulnerability mapping based on the PaPRIKa method
 
@@ -38,14 +38,15 @@ repository=https://github.com/Paprika-plugins/PaPRIKa
 
 # Uncomment the following line and add your changelog:
 changelog=
-	1.0 : - First version of plugin on repository.
-    1.1 : - Bug fixes and upgrade to fit with 2.18
+    2.2 : - Bug fixes with threading
     2.1 : - Bring compatibility for QGIS3 (old version still ok with QGIS2)
           - Extension layer is not needed anymore
           - Now use threading to run costly alg in background
           - Remember last used value (weight and working directory)
           - Update About
           - Refactor a lot
+    1.1 : - Bug fixes and upgrade to fit with 2.18
+	1.0 : - First version of plugin on repository.
 
 # Tags are comma separated with spaces allowed
 tags= PaPRIKa,vector,raster,vulnerability,karst
